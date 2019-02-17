@@ -1,0 +1,21 @@
+---
+title: Lawrence Jones
+email: me@lawrjone.xyz
+description: |
+  Working on building reliable infrastructure and tooling for GoCardless, a
+  fast-growing fintech based in London. Focused tackling infrastructure problems
+  with a software engineering mindset.
+
+url: "https://blog.lawrjone.xyz"
+baseurl: ""
+twitter_username: lawrjone
+github_username: lawrencejones
+show_excerpts: true
+collections:
+  - medium_posts
+
+# Build settings
+markdown: kramdown
+theme: minima
+plugins:
+  - jekyll-feed

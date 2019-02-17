@@ -1,0 +1,12 @@
+---
+layout: post
+title:  "Diggit- Mining git repositories for developer insights"
+date:   "2016-04-28 12:00:00 +0000"
+categories: []
+external_url: "https://medium.com/@lawrjone/diggit-mining-git-repositories-for-developer-insights-27aebe4070a6"
+excerpt: |
+  By flagging code smells in review, diggit raises awareness of problems at a
+  point in the development process where code can easily be changed, with an
+  audience of devs who are immediately familiar with program context.
+
+---
