@@ -1,0 +1,66 @@
+---
+version: 2
+
+references:
+  bundle_install: &bundle_install
+    run:
+      name: Bundle
+      command: gem install bundler && bundle install --path vendor/bundle --jobs=4 --retry=3
+
+  cache_bundle_for_lockfile: &cache_bundle_for_lockfile
+    save_cache:
+      key: ruby2.6.1-Gemfile-{{ checksum "Gemfile.lock" }}
+      paths:
+        - vendor/bundle
+
+  cache_bundle: &cache_bundle
+    save_cache:
+      key: ruby2.6.1-Gemfile
+      paths:
+        - vendor/bundle
+
+  restore_bundle: &restore_bundle
+    restore_cache:
+      keys:
+        - ruby2.6.1-Gemfile-{{ checksum "Gemfile.lock" }}
+        - ruby2.6.1-Gemfile
+
+jobs:
+  build:
+    docker:
+      - image: "ruby:2.6.1"
+    working_directory: ~/blog
+    steps:
+      - checkout
+      - *restore_bundle
+      - *bundle_install
+      - *cache_bundle_for_lockfile
+      - *cache_bundle
+      - run: bundle exec jekyll build
+      - store_artifacts:
+          path: _site
+      - persist_to_workspace:
+          root: ~/blog
+          paths:
+            - _site
+
+  deploy:
+    docker:
+      - image: "google/cloud-sdk"
+    working_directory: ~/blog
+    steps:
+      - run: |
+          echo $GOOGLE_APPLICATION_CREDENTIALS_KEY | gcloud auth activate-service-account --key-file=-
+          gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+          gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+      - attach_workspace: {at: ~/blog}
+      - run: gsutil rsync -R _site gs://blog.lawrjone.xyz
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
