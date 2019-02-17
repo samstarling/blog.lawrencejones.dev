@@ -8,3 +8,13 @@ experience.
 
 Merging to master triggers CircleCI to deploy any changes. The site is hosted
 using Google Cloud Storage with Cloudflare for DNS and SSL.
+
+## Upcoming
+
+- pgreplay-go: realistic Postgres performance testing
+- theatre: learning Kubernetes operators
+- Measuring database write amplification
+- Minimal helm chart snapshot tests
+- Building an observable queuing system (Que)
+- Tracking queue characteristics in code
+- Managing Prometheus rules in code
