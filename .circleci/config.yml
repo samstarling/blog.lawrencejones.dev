@@ -54,7 +54,7 @@ jobs:
           gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
           gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
       - attach_workspace: {at: ~/blog}
-      - run: gsutil rsync -R _site gs://blog.lawrjone.xyz
+      - run: gsutil rsync -R _site gs://blog.lawrencejones.dev
 
 workflows:
   version: 2

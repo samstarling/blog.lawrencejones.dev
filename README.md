@@ -1,4 +1,4 @@
-# [blog.lawrjone.xyz](https://blog.lawrjone.xyz/) [![CircleCI](https://circleci.com/gh/lawrencejones/blog.lawrjone.xyz.svg?style=svg)](https://circleci.com/gh/lawrencejones/blog.lawrjone.xyz)
+# [blog.lawrencejones.dev](https://blog.lawrencejones.dev/) [![CircleCI](https://circleci.com/gh/lawrencejones/blog.lawrencejones.dev.svg?style=svg)](https://circleci.com/gh/lawrencejones/blog.lawrencejones.dev)
 
 My personal blog, collating the material I've authored over my career. Currently
 most links will link to Medium articles for a better editing and sharing
