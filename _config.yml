@@ -2,9 +2,9 @@
 title: Lawrence Jones
 email: me@lawrencejones.dev
 description: |
-  Working on building reliable infrastructure and tooling for GoCardless, a
-  fast-growing fintech based in London. Focused tackling infrastructure problems
-  with a software engineering mindset.
+  Working on building reliable infrastructure for GoCardless, a fast-growing
+  fintech based in London. Focused on tackling infrastructure problems with a
+  software engineering mindset.
 
 url: "https://blog.lawrencejones.dev"
 baseurl: ""
@@ -19,3 +19,4 @@ markdown: kramdown
 theme: minima
 plugins:
   - jekyll-feed
+  - jekyll-toc
