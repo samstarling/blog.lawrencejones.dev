@@ -11,6 +11,9 @@ excerpt: |
   and explain some challenges in the implementation, focusing on what I learned
   personally from the process.
 
+# Originally posted to this link, preserve for posterity
+redirect_from:
+  - 2019/03/07/building-a-postgresql-load-tester.html
 ---
 
 Some of my recent work at [GoCardless](https://gocardless.com/) uncovered a need

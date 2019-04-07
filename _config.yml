@@ -6,6 +6,10 @@ description: |
   fintech based in London. Focused on tackling infrastructure problems with a
   software engineering mindset.
 
+# Don't use the default /yyyy/mm/dd/title permalink to avoid breaking links when
+# you change publish date.
+permalink: /:categories/:title/
+
 url: "https://blog.lawrencejones.dev"
 baseurl: ""
 show_excerpts: true
@@ -19,6 +23,7 @@ theme: minima
 plugins:
   - jekyll-feed
   - jekyll-toc
+  - jekyll-redirect-from
 
 minima:
   social_links:
