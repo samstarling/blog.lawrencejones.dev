@@ -4,14 +4,9 @@ title: About
 permalink: /about/
 ---
 
-I'm Lawrence, a Site Reliability Engineer at GoCardless in London. My team
-focuses on scaling our payments API across the globe while providing a reliable
-and robust service to our customers.
-
-We prefer to frame infrastructure challenges as software engineering problems,
-as we believe this results in solutions that can better scale with an
-organisation. We'll soon see whether this holds as we race to build self-serve
-infrastructure tooling that can keep up with an ever-growing engineering team.
+I'm Lawrence, a Site Reliability Engineer at GoCardless. My team focuses on
+scaling our payments API across the globe while providing a reliable and robust
+service to our customers.
 
 My writing will centre around the technical challenges I face on my day-to-day.
 You can expect to see posts about Postgres, Kubernetes and general engineering
