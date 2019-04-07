@@ -8,8 +8,6 @@ description: |
 
 url: "https://blog.lawrencejones.dev"
 baseurl: ""
-twitter_username: lawrjone
-github_username: lawrencejones
 show_excerpts: true
 google_analytics: UA-134680924-1
 collections:
@@ -21,3 +19,8 @@ theme: minima
 plugins:
   - jekyll-feed
   - jekyll-toc
+
+minima:
+  social_links:
+    twitter: lawrjone
+    github: lawrencejones

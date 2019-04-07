@@ -1,7 +1,0 @@
-/* All image captions, slightly grey and centered */
-figure > figcaption {
-  font-style: italic;
-  color: #637282;
-  text-align: center;
-  margin-top: 4px;
-}
