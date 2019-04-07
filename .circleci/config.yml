@@ -36,7 +36,7 @@ jobs:
       - *bundle_install
       - *cache_bundle_for_lockfile
       - *cache_bundle
-      - run: bundle exec jekyll build
+      - run: JEKYLL_ENV=production bundle exec jekyll build
       - store_artifacts:
           path: _site
       - persist_to_workspace:

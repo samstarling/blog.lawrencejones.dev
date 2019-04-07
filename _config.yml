@@ -11,6 +11,7 @@ baseurl: ""
 twitter_username: lawrjone
 github_username: lawrencejones
 show_excerpts: true
+google_analytics: UA-134680924-1
 collections:
   - medium_posts
 
