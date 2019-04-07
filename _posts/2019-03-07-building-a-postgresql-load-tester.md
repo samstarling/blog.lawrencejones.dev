@@ -15,7 +15,7 @@ excerpt: |
 
 Some of my recent work at [GoCardless](https://gocardless.com/) uncovered a need
 to benchmark a Postgres cluster. In an attempt to simulate a realistic workload
-wrote a tool that replays captured Postgres activity against a live server,
+I wrote a tool that replays captured Postgres activity against a live server,
 providing an opportunity to predict how queries might degrade with configuration
 changes.
 
