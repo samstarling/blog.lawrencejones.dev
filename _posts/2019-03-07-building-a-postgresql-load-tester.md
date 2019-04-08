@@ -271,7 +271,7 @@ each benchmark.
 
 The need to lazily consume our logs is why the parsing implementation returns a
 `chan Item` that asynchronously receives parsed items. Sending a message down a
-Go channel will block the calling gorouting until the message is consumed. We
+Go channel will block the calling goroutine until the message is consumed. We
 can exploit this behaviour by implementing our streaming component as a consumer
 of our parse channel, pulling items from the parser only when they
 should be consumed according to their original log entry time.
