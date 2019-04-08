@@ -43,19 +43,19 @@ under production load, helping determine if changes are going to degrade
 performance.
 
 This process had worked well before but broke as soon as I applied it to this
-migration. Watching Postgres activity during a replay, there were spikes of
-activity followed by periods of quiet:
+migration. Watching Postgres during a replay, there were spikes of activity
+followed by periods of quiet:
 
 <figure>
   <img src="/assets/images/pgreplay-blocking.png" alt="pgreplay waiting on degraded queries"/>
   <figcaption>pgreplay waiting on degraded queries</figcaption>
 </figure>
 
-The new cluster is different enough that several queries were now performing
-far worse than they had originally. pgreplay will ensure queries execute in
-their original order - any queries that take longer to execute in the replay
-will block subsequent queries. The graph shows how several badly degraded
-queries caused pgreplay to stall, leading to the periods of inactivity.
+The new cluster was sufficiently different that several queries were now much
+slower than they had been in the original log capture. pgreplay will ensure
+queries execute in their original order- any queries that take longer to execute
+in the replay will block subsequent queries. The graph shows how several badly
+degraded queries caused pgreplay to stall, leading to the periods of inactivity.
 
 Benchmarks can take several hours to execute and having the replay stall for
 problematic queries adds more time to an already slow process. The inactivity
@@ -86,14 +86,13 @@ In a burst of optimistic naivety, I decided it was worth giving it a shot.
 
 ### Log parsing: how hard can it be?
 
-By necessity, I started with log parsing. I initially thought this would be easy
-- I couldn't have been more wrong, and I soon found myself questioning my choice
-of Go as the implementation language.
+By necessity, we start by parsing the Postgres logs. I initially thought this
+would be easy and couldn't have been more wrong!
 
 #### Multi-line tokenising
 
-You'd ideally split the log file by newlines to find each entry, but the
-Postgres errlog format doesn't work like this. As most log entries contain
+When parsing logs you usually split the file by newlines to find each entry, but
+the Postgres errlog format doesn't work like this. As most log entries contain
 newlines, the errlog format allows for newline characters by prefixing
 continuation lines with a leading tab character (`\t`).
 
@@ -110,7 +109,7 @@ terminate, complicating the logic around when to split.
 
 Given this was a small, simple project, I was keen to avoid heavy-weight
 parser-generators that would require an additional build step. I instead reached
-for the standard library to tokenise my log lines - after all, Go has an
+for the standard library to tokenise my log lines- after all, Go has an
 interface called a [`Scanner`](https://golang.org/pkg/bufio/#Scanner) for
 exactly this purpose.
 
@@ -139,7 +138,7 @@ logged like this:
 [1] LOG:  statement: select now();
 ```
 
-These are easy - we parse the query from this line and execute it against the
+These are easy- we parse the query from this line and execute it against the
 server. It's the extended protocol that gets hard.
 
 Extended query protocol provides safe handling of query parameters by divorcing
@@ -264,11 +263,11 @@ by a database:
 parse(logs) -> stream(replayRate) -> replay(database)
 ```
 
-Ideally this replay tool would be so efficient at parsing logs that we could run
-it from the same box as the target Postgres without affecting our benchmark.
-This requires us to rate limit the parser to read only as much log as we
-currently need to replay, preventing us from trashing our disk parsing GBs of
-logs at the start of our benchmarks.
+Ideally this replay tool would be so efficient that we could run it from the
+same box as the target Postgres without affecting our benchmark. This requires
+us to rate limit the parser to read only as much log as we currently need to
+replay, preventing us from trashing our disk parsing GBs of logs at the start of
+each benchmark.
 
 The need to lazily consume our logs is why the parsing implementation returns a
 `chan Item` that asynchronously receives parsed items. Sending a message down a
@@ -489,7 +488,7 @@ amount of activity as production in our target cluster, until...
 While close, dying just 20m into a 3hr benchmark isn't going to cut it. After
 losing some hours debugging deadlocks and segfaults it became clear I needed
 more visibility. Go is known for many things but fearless concurrency is not one
-of them - so many things could be going wrong that guessing wasn't getting me
+of them- so many things could be going wrong that guessing wasn't getting me
 far without more information.
 
 I skimmed through each component of the pipeline and added simple Prometheus
