@@ -117,7 +117,7 @@ Several hours and some considerable frustration later, I had a [splitter
 function](https://github.com/gocardless/pgreplay-go/blob/v0.1.2/pkg/pgreplay/parse.go#L346-L406)
 full of error-prone mutation and a distinct feeling that `strtok` would have
 been less painful. This was something I hadn't considered when choosing Go for
-the implementation, but the stdlib support for string maniuplation is really
+the implementation, but the stdlib support for string manipulation is really
 poor compared to what I'm used to. It caught me off-guard that Go would be so
 poorly suited to the task.
 
