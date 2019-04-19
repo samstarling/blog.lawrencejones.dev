@@ -2,7 +2,7 @@
 layout: post
 title:  "Building a PostgreSQL load tester"
 toc:    true
-date:   "2019-03-07 11:00:00 +0000"
+date:   "2019-04-07 11:00:00 +0000"
 tags:
   - postgres
 excerpt: |
