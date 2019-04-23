@@ -104,7 +104,7 @@ probably instrumenting HTTP requests. Running our experiment yields some
 interesting results:
 
 <figure>
-  <img src="/assets/images/long-tasks-naive.png" alt="time spent by job class for naive approach"/>
+  <img src="{{ "/assets/images/long-tasks-naive.png" | prepend:site.baseurl }}" alt="time spent by job class for naive approach"/>
   <figcaption>
     <code>
       sum by (job) (rate(job_worked_seconds_total[15s]))
@@ -138,7 +138,7 @@ Larger rate intervals will smooth this effect, allowing us to more clearly see
 the 10 individual workers:
 
 <figure>
-  <img src="/assets/images/long-tasks-naive-1m.png" alt="time spent by job class for naive approach with 1m interval"/>
+  <img src="{{ "/assets/images/long-tasks-naive-1m.png" | prepend:site.baseurl }}" alt="time spent by job class for naive approach with 1m interval"/>
   <figcaption>
     <code>
       sum by (job) (rate(job_worked_seconds_total[1m]))
@@ -296,7 +296,7 @@ of workers we're running and doesn't fluctuate despite the varied jobs worked/s
 (yellow).
 
 <figure>
-  <img src="/assets/images/long-tasks-preemptive.png" alt="time spent by job class for pre-emptive approach"/>
+  <img src="{{ "/assets/images/long-tasks-preemptive.png" | prepend:site.baseurl }}" alt="time spent by job class for pre-emptive approach"/>
   <figcaption>
     <code>
       sum by (job) (rate(job_worked_seconds_total[15s]))
@@ -313,7 +313,7 @@ queuing system that has been instrumented to the hilt with Prometheus metrics,
 with every second of work accounted for.
 
 <figure>
-  <img src="/assets/images/long-tasks-que.png" alt="time spent by job class for que"/>
+  <img src="{{ "/assets/images/long-tasks-que.png" | prepend:site.baseurl }}" alt="time spent by job class for que"/>
   <figcaption>
     Results from production across many workers
   </figcaption>
