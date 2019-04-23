@@ -36,7 +36,13 @@ jobs:
       - *bundle_install
       - *cache_bundle_for_lockfile
       - *cache_bundle
-      - run: JEKYLL_ENV=production bundle exec jekyll build
+      - run: |
+          export JEKYLL_ENV=production
+          if [[ $CIRCLE_BRANCH == "master" ]]; then
+            bundle exec jekyll build
+          else
+            bundle exec jekyll build --baseurl "/staging/${CIRCLE_BRANCH}"
+          fi
       - store_artifacts:
           path: _site
       - persist_to_workspace:
@@ -54,7 +60,13 @@ jobs:
           gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
           gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
       - attach_workspace: {at: ~/blog}
-      - run: gsutil rsync -R _site gs://blog.lawrencejones.dev
+      - run: |
+          if [[ $CIRCLE_BRANCH == "master" ]]; then
+            gsutil rsync -R _site "gs://blog.lawrencejones.dev"
+          else
+            gsutil rsync -R _site "gs://blog.lawrencejones.dev/staging/${CIRCLE_BRANCH}"
+          fi
+
 
 workflows:
   version: 2
@@ -64,7 +76,3 @@ workflows:
       - deploy:
           requires:
             - build
-          filters:
-            branches:
-              only:
-                - master
