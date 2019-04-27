@@ -14,17 +14,43 @@ excerpt: |
 
 ---
 
+Almost all applications run a 'worker tier' or some deployment that can process
+asynchronous work. The work can be varied, from jobs that take just milliseconds
+to large hour-long batches. The only common theme is these jobs are essential
+for the health of the system, often doing the heavy lifting that makes your
+product worth anyone's time.
+
+It's important to measure systems like this to identify issues before they
+affect users and debug them once they pass. When something breaks and you
+suspect it's a problem in the queue, one of the most important questions you can
+ask is:
+
+> What are the workers doing- what jobs are they working?
+
+When investigating an incident involving workers like this, I found myself
+totally unable to answer this question despite workers exposing metrics about
+their activity. Digging deeper, it became clear that the instrumentation was
+subject to a bias so significant that measurements were actively misleading.
+
+This post explores what and how we should measure this system so we can properly
+answer these questions. The most simple implementation- the one I fought with
+during the incident- will give results that are worse than useless. We'll
+understand this bias through experimentation and conclude with an approach that
+can be used to ensure reliable measurements.
+
+---
+
 Imagine you have async workers that process jobs from a queue. Each job is
 different and some will complete in milliseconds, while others take hours to
 process.
 
-You'll want to measure this system, right? These workers are essential for your
-systems to run smoothly, providing the heavy lifting behind the scenes that make
-your product worth anyone's time. One of the most useful questions we might ask
-ourselves is:
+These workers are essential for your systems to run smoothly, providing the
+heavy lifting behind the scenes that make your product worth anyone's time.
+You'll want to measure this system, right? If we don't measure it, we'll be
+unable to know when or why our system is misbehaving, or answer key questions
+like:
 
-> At any moment, what jobs are workers working, and how much time is spent on
-> each job?
+> What jobs are workers working, and how much time is spent on each job?
 
 This post explores what and how we should measure the system to answer the
 question. The most simple implementation will give results that are actively
