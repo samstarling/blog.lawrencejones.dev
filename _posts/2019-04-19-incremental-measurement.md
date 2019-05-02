@@ -8,26 +8,27 @@ tags:
 
 audience: Basic to advanced Prometheus users who use metrics in their work
 goals: Understand time-of-measurement bias, know how a MetricTracer might help
+links:
+  - https://snapshot.raintank.io/dashboard/snapshot/PFfWQ21fQgeQkF7FGhR4zsiOGOnNFpOr?orgId=2
   
 excerpt: |
   TODO
 
 ---
 
-Almost all applications run a 'worker tier' or some deployment that can process
+Most applications run a 'worker tier' or some deployment that processes
 asynchronous work. The work can be varied, from jobs that take just milliseconds
 to large hour-long batches. The only common theme is these jobs are essential
 for the health of the system, often doing the heavy lifting that makes your
 product worth anyone's time.
 
-It's important to measure systems like this to identify issues before they
-affect users and debug them once they pass. When something breaks and you
-suspect it's a problem in the queue, one of the most important questions you can
-ask is:
+It's important to measure systems like this to find issues before they affect
+users and to debug them when they do. When something breaks and you suspect it's
+a problem in the queue, one of the most important questions you can ask is:
 
 > What are the workers doing- what jobs are they working?
 
-When investigating an incident involving workers like this, I found myself
+When investigating an incident involving workers like this I found myself
 totally unable to answer this question despite workers exposing metrics about
 their activity. Digging deeper, it became clear that the instrumentation was
 subject to a bias so significant that measurements were actively misleading.
@@ -38,24 +39,94 @@ during the incident- will give results that are worse than useless. We'll
 understand this bias through experimentation and conclude with an approach that
 can be used to ensure reliable measurements.
 
+## The incident
+
+Alerts were firing about dropped requests and the HTTP dashboard confirmed it-
+queues were building and requests timing out. About two minutes later pressure
+flooded out the system and normality was restored.
+
+Looking closer, our API servers had stalled waiting on the database to respond,
+causing all activity to grind to an abrupt halt. The prime suspect wielding
+enough capacity to hit the database like this was the asynchronous worker tier,
+so you naturally ask what on earth were the workers doing?
+
+The workers expose a Prometheus metric that tracks how they spend their time. It
+looks like this:
+
+```
+# HELP job_worked_seconds_total Sum of the time spent processing each job class
+# TYPE job_worked_seconds_total counter
+job_worked_seconds_total{job}
+```
+
+By tracking the sum of seconds spent working each job type, the rate at which
+the metric changes can identify how much worker time has been consumed. An
+increase of 15 over an interval of 15s implies a single continuously occupied
+worker (one second for every second that elaspes) while an increase of 30 would
+imply two workers, etc.
+
+Graphing worker activity during this incident should show us what we were up to.
+Doing so results in this sad graph, with the time of incident (16:02-16:04)
+marked with an appropriately alarming red arrow:
+
+<figure>
+  <img src="{{ "/assets/images/long-tasks-hole-in-metrics.png" | prepend:site.baseurl }}" alt="hole in worker metrics around incident"/>
+  <figcaption>
+    Worker activity at time of incident with a notable gap
+  </figcaption>
+</figure>
+
+As the person debugging this mess, it hurt me to see the graph flatline at
+exactly the time of the incident. I'd already checked the logs so I knew the
+workers were busy- not only that, but that large blue spike at 16:05? It's time
+spent working webhooks, for which we run twenty dedicated workers. How could ten
+single threaded workers spend 45s per second working?
+
+## Where it all went wrong
+
+The incident graph is lying to us by both hiding and over-reporting work
+depending on where you take the measurement. Understanding why requires us to
+consider the implementation of the metric tracking and how that interacts with
+Prometheus taking the measurements.
+
+Starting with how workers take measurements, we can sketch an implementation of
+the worker process below. Notice that workers will only update the metric after
+the job has finished running.
+
+```ruby
+class Worker
+  JobWorkedSecondsTotal = Prometheus::Client::Counter.new(...)
+
+  def work
+    job = acquire_job
+    start = Time.monotonic_now
+    job.run
+  ensure # run after our main method block
+    duration = Time.monotonic_now - start
+    JobWorkedSecondsTotal.increment(by: duration, labels: { job: job.class })
+  end
+end
+```
+
+Prometheus (with its pull-based metrics philosophy) makes a GET request to each
+worker every 15s to record the metric values at the request time. As workers
+constantly update the job worked metric, over time we can plot how this value
+has changed.
+
+We start seeing our over/under-reporting issue when jobs take longer than the
+interval Prometheus scrapes (15s). Imagine a job that takes 1m to execute:
+Prometheus will scrape the worker four times in that interval, but the metric
+value will only be updated after the fourth scrape.
+
+TODO: Drawing a timeline of worker activity can make it clear how this 
+This can be shown if we draw out a timeline of workers including the
+jobs they were processing. 
+
+<figure>
+  <img src="{{ "/assets/images/long-tasks-bias-diagram.svg" | prepend:site.baseurl }}" alt="diagram of bias"/>
+</figure>
+
 ---
-
-Imagine you have async workers that process jobs from a queue. Each job is
-different and some will complete in milliseconds, while others take hours to
-process.
-
-These workers are essential for your systems to run smoothly, providing the
-heavy lifting behind the scenes that make your product worth anyone's time.
-You'll want to measure this system, right? If we don't measure it, we'll be
-unable to know when or why our system is misbehaving, or answer key questions
-like:
-
-> What jobs are workers working, and how much time is spent on each job?
-
-This post explores what and how we should measure the system to answer the
-question. The most simple implementation will give results that are actively
-misleading- we'll demonstrate this by experimentation, concluding with an
-approach that is used in production systems to ensure reliable measurements.
 
 ## What to measure?
 
