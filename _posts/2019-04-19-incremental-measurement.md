@@ -1,54 +1,52 @@
 ---
 layout: post
-title:  "Avoid time-of-measurement bias using Prometheus"
+title:  "Avoid time-of-measurement bias with Prometheus"
 date:   "2019-04-19 11:00:00 +0000"
+toc:    true
 tags:
   - prometheus
   - observability
-
 audience: Basic to advanced Prometheus users who use metrics in their work
 goals: Understand time-of-measurement bias, know how a MetricTracer might help
 links:
+  - https://gist.github.com/lawrencejones/f419e478106ab1ecbe007e7d9a9ca937
   - https://snapshot.raintank.io/dashboard/snapshot/PFfWQ21fQgeQkF7FGhR4zsiOGOnNFpOr?orgId=2
-  
 excerpt: |
   TODO
 
 ---
 
-Most applications run a 'worker tier' or some deployment that processes
-asynchronous work. The work can be varied, from jobs that take just milliseconds
-to large hour-long batches. The only common theme is these jobs are essential
-for the health of the system, often doing the heavy lifting that makes your
-product worth anyone's time.
+Most applications consist of a web server which handles live traffic and some
+sort of worker tier that can process work asynchronously. There's a lot of great
+advice on how to measure the health of live web traffic, and the community
+continues to develop tools like Prometheus that can help support this
+instrumentation.
 
-It's important to measure systems like this to find issues before they affect
-users and to debug them when they do. When something breaks and you suspect it's
-a problem in the queue, one of the most important questions you can ask is:
+But looking past web traffic, our workers are often as- if not more- critical to
+service health. We should care about and measure these too, but there's little
+guidance about how to do so while avoiding common pitfalls.
 
-> What are the workers doing- what jobs are they working?
+This post explores one of the pitfalls often found when measuring async work,
+using the example of a production incident where despite having metrics it was
+not possible to accurately determine what workers were doing. The metric
+implementation had created a bias so significant that the metrics were outright
+lying, rendering them unusable.
 
-When investigating an incident involving workers like this I found myself
-totally unable to answer this question despite workers exposing metrics about
-their activity. Digging deeper, it became clear that the instrumentation was
-subject to a bias so significant that measurements were actively misleading.
-
-This post explores what and how we should measure this system so we can properly
-answer these questions. The most simple implementation- the one I fought with
-during the incident- will give results that are worse than useless. We'll
-understand this bias through experimentation and conclude with an approach that
-can be used to ensure reliable measurements.
+We'll see how to adjust the implementation to provide accurate measurements, and
+conclude with an open-source reference implementation of a
+[prometheus-client-tracer](https://github.com/lawrencejones/prometheus-client-tracer-ruby)
+you can use in your own applications.
 
 ## The incident
 
-Alerts were firing about dropped requests and the HTTP dashboard confirmed it-
-queues were building and requests timing out. About two minutes later pressure
-flooded out the system and normality was restored.
+Alerts were firing for increased HTTP error rate, and the dashboards confirmed
+it- queues were building and requests timing out. About two minutes later the
+queues cleared and normality was restored.
 
 Looking closer, our API servers had stalled waiting on the database to respond,
-causing all activity to grind to an abrupt halt. The prime suspect wielding
-enough capacity to hit the database like this was the asynchronous worker tier,
-so you naturally ask what on earth were the workers doing?
+causing all activity to grind to an abrupt halt. Given most database heavy work
+happens in the asynchronous worker tier, the workers were the obvious prime
+suspect. The natural follow-up is to ask what on earth the workers were doing?
 
 The workers expose a Prometheus metric that tracks how they spend their time. It
 looks like this:
@@ -62,7 +60,7 @@ job_worked_seconds_total{job}
 By tracking the sum of seconds spent working each job type, the rate at which
 the metric changes can identify how much worker time has been consumed. An
 increase of 15 over an interval of 15s implies a single continuously occupied
-worker (one second for every second that elaspes) while an increase of 30 would
+worker (one second for every second that elapses) while an increase of 30 would
 imply two workers, etc.
 
 Graphing worker activity during this incident should show us what we were up to.
@@ -76,13 +74,14 @@ marked with an appropriately alarming red arrow:
   </figcaption>
 </figure>
 
-As the person debugging this mess, it hurt me to see the graph flatline at
-exactly the time of the incident. I'd already checked the logs so I knew the
-workers were busy- not only that, but the large blue spike at 16:05? It's time
-spent working webhooks, for which we run twenty dedicated workers. How could ten
-single threaded workers spend 45s per second working?
+As the person debugging this mess, it hurt to see the graph drop to minimal
+activity at the exact time of the incident. I'd already checked the logs so I
+knew the workers were busy- not only that, but the large blue spike at 16:05?
+It's time spent working webhooks, for which we run twenty dedicated workers. How
+could twenty single threaded workers spend 45s per second working, as the graph
+implies?
 
-## Where it all went wrong
+## Where it went wrong
 
 The incident graph is lying to us by both hiding and over-reporting work
 depending on where you take the measurement. Understanding why requires us to
@@ -90,8 +89,8 @@ consider the implementation of the metric tracking and how that interacts with
 Prometheus taking the measurements.
 
 Starting with how workers take measurements, we can sketch an implementation of
-the worker process below. Notice that workers will only update the metric after
-the job has finished running.
+the worker process below. Notice that workers will only update the metric _after
+the job has finished running_.
 
 ```ruby
 class Worker
@@ -113,10 +112,15 @@ worker every 15s to record the metric values at the request time. As workers
 constantly update the job worked metric, over time we can plot how this value
 has changed.
 
-We start seeing our over/under-reporting issue when jobs take longer than the
-interval Prometheus scrapes (15s). Imagine a job that takes 1m to execute:
-Prometheus will scrape the worker four times in that interval, but the metric
-value will only be updated after the fourth scrape.
+We start seeing our over/under-reporting issue whenever jobs execute across a
+scrape boundary, where scrapes happen every 15s. Imagine a job that begins
+execution 5s before a scrape and finishes 1s after- in total, the job executes
+for 6s, but that 6s is only visible in the measurement taken after the scrape,
+despite 5s of work happening before that point.
+
+This effect becomes even more exaggerated when jobs take longer than the scrape
+interval (15s). During the execution of a 1m job, Prometheus will scrape the
+worker four times, but the metric is only updated after the fourth scrape.
 
 Drawing a timeline of worker activity can make it clear how the moment we update
 our metric affects what Prometheus sees. In the diagram below, we map the
@@ -135,18 +139,32 @@ second. If every worker starts working long jobs, we'll report no work being
 done until they end, even if that's hours later.
 
 To demonstrate this effect, I created an experiment with ten workers working
-jobs of varying duration half-normally distributed between 0.1s and 30s (see
+jobs of varying duration half-normally distributed between 0.1s and some upper
+duration boundary (see
 [seed-jobs](https://gist.github.com/lawrencejones/f419e478106ab1ecbe007e7d9a9ca937#file-seed-jobs)).
-Despite each worker performing a constant rate of work, graphing the job worked
-metric results in a spiky graph that jumps above and below the real measurement
-of 10s per second of work:
+Here are three graphs of reported worker activity, each with increasing job
+durations. As jobs become longer, the bias becomes more noticeable, until in the
+third graph we jump above and below the real measurement (10s of work per
+second) by a huge degree.
 
 <figure>
-	<a target="_blank" href="https://snapshot.raintank.io/dashboard/snapshot/r9cBxt26Bs1PBI3mqfTS72Cf55dSmeTn">
-  	<img src="{{ "/assets/images/long-tasks-experiment-bias.png" | prepend:site.baseurl }}" alt="work by worker with biased measurement"/>
-	</a>
+  <img src="{{ "/assets/images/long-tasks-experiment-bias-0_1-1_0.png" | prepend:site.baseurl }}" alt="work by worker with jobs between 0.1s and 1s in duration"/>
   <figcaption>
-    Work by worker with biased measurement- under and over reporting
+    Jobs up-to 1s in duration
+  </figcaption>
+</figure>
+
+<figure>
+  <img src="{{ "/assets/images/long-tasks-experiment-bias-0_1-15_0.png" | prepend:site.baseurl }}" alt="work by worker with jobs between 0.1s and 15s in duration"/>
+  <figcaption>
+    Jobs up to 15s in duration
+  </figcaption>
+</figure>
+
+<figure>
+  <img src="{{ "/assets/images/long-tasks-experiment-bias-0_1-30_0.png" | prepend:site.baseurl }}" alt="work by worker with jobs between 0.1s and 30s in duration"/>
+  <figcaption>
+    Jobs up to 30s in duration
   </figcaption>
 </figure>
 
@@ -172,14 +190,14 @@ workers to update metrics whenever Prometheus scrapes them, just before they
 return scrape results, then we'll ensure Prometheus is always up-to-date with
 on-going activity.
 
-### Introducing... MetricTracer
+### Introducing... Tracer
 
-One solution to the time-of-measurement bias is a `MetricTracer`, an abstraction
+One solution to the time-of-measurement bias is a `Tracer`, an abstraction
 designed to take long-running duration measurements while incrementally updating
 the associated Prometheus metric.
 
 ```ruby
-class MetricTracer
+class Tracer
   def trace(metric, labels, &block)
     ...
   end
@@ -202,7 +220,7 @@ new tracer and ask it to trace the execution of `acquire_job.run`.
 ```ruby
 class Worker
   def initialize
-    @tracer = MetricTracer.new(self)
+    @tracer = Tracer.new(self)
   end
 
   def work
@@ -248,10 +266,9 @@ receives a request, will first call `collect` on all the workers, then have the
 Prometheus client render scrape results. 
 
 Returning to our diagram, this means we update the metric whenever the job ends
-or we receive a scrape. The jobs that span across scrapes contribute fairly on
-either side, as shown by the jobs straddling the 15s scrape time splitting their
-duration evenly. Regardless of the size of our jobs, we've incremented the
-metric by 30s (2 x 15s) for each scrape interval.
+**or** we receive a scrape. The jobs that span across scrapes contribute fairly
+on either side, as shown by the jobs straddling the 15s scrape time splitting
+their duration.
 
 <figure>
   <img src="{{ "/assets/images/long-tasks-diagram-tracer.svg" | prepend:site.baseurl }}" alt="diagram of tracer collection"/>
@@ -265,44 +282,48 @@ exceeded the number of workers we were running and periods of total silence,
 re-running our experiment with ten workers produces a graph that clearly shows
 each worker contributing evenly to the reported work.
 
-
 <figure>
 	<a target="_blank" href="https://snapshot.raintank.io/dashboard/snapshot/r9cBxt26Bs1PBI3mqfTS72Cf55dSmeTn">
   	<img src="{{ "/assets/images/long-tasks-experiment-before-after.png" | prepend:site.baseurl }}" alt="comparison of biased vs tracer results"/>
 	</a>
   <figcaption>
-    Comparison of biased (left) and tracer managed (right) metrics, taken from
-    the same worker experiment
+    Comparison biased (left) and tracer managed (right) metrics, taken from the
+    same worker experiment
   </figcaption>
 </figure>
 
 In comparison to the outright misleading and chaotic graph from our original
 measurements, metrics managed by the tracer are stable and consistent. Not only
 do we accurately assign work to each scrape but we are now indifferent to
-violent worker death: Prometheus will have tracked the metric up until the
-worker disappears, ensuring we don't lose that information if the worker goes
-away.
+violent worker death: Prometheus will have recorded the metric up until the
+worker disappears, ensuring that work doesn't disappear if the worker goes away.
 
-## Can I use this?
+### Can I use this?
 
-TODO
+Yes! The `Tracer` interface is something I've found useful across multiple
+projects and have extracted into a separate Ruby gem,
+[prometheus-client-tracer](https://github.com/lawrencejones/prometheus-client-tracer-ruby).
+If you use the Prometheus client in your Ruby applications, just add
+`prometheus-client-tracer` to your Gemfile then:
 
-Most of the code snippets have been extracted from GoCardless' fork of
-[chanks/que](https://github.com/chanks/que), a Postgres queuing system that has
-been instrumented to the hilt with Prometheus metrics, using a `MetricTracer` to
-ensure accurate accounting of every part of a worker's lifecycle.
+```ruby
+require "prometheus/client"
+require "prometheus/client/tracer"
 
-I've collected some of the code used in this post into a
-[Gist](https://gist.github.com/lawrencejones/f419e478106ab1ecbe007e7d9a9ca937),
-including a full reference implementation of the `MetricTracer`. Any feedback
-or corrections are welcome- reach out on Twitter or [open a
-PR](https://github.com/lawrencejones/blog.lawrencejones.dev).
+JobWorkedSecondsTotal = Prometheus::Client::Counter.new(...)
 
----
+Prometheus::Client.trace(JobWorkedSecondsTotal) do
+  sleep(long_time)
+end
+```
 
-<figure>
-  <img src="{{ "/assets/images/long-tasks-que.png" | prepend:site.baseurl }}" alt="time spent by job class for que"/>
-  <figcaption>
-    Results from production across many workers
-  </figcaption>
-</figure>
+# Final thoughts
+
+I hope this will help people become more aware of how they measure long-running
+tasks, and unveil one of the common issues that occur when doing so. It should
+also be clear that this problem isn't just for asynchronous work- if your HTTP
+requests can get slow, they'll also benefit from using a tracer to track time
+spent working.
+
+As always, any feedback or corrections are welcome- reach out on Twitter or
+[open a PR](https://github.com/lawrencejones/blog.lawrencejones.dev).
