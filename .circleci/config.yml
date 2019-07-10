@@ -41,7 +41,7 @@ jobs:
           if [[ $CIRCLE_BRANCH == "master" ]]; then
             bundle exec jekyll build
           else
-            bundle exec jekyll build --baseurl "/staging/${CIRCLE_BRANCH}"
+            bundle exec jekyll build --baseurl "/branch/${CIRCLE_BRANCH}"
           fi
       - store_artifacts:
           path: _site
@@ -64,7 +64,7 @@ jobs:
           if [[ $CIRCLE_BRANCH == "master" ]]; then
             gsutil rsync -R _site "gs://blog.lawrencejones.dev"
           else
-            gsutil rsync -R _site "gs://blog.lawrencejones.dev/staging/${CIRCLE_BRANCH}"
+            gsutil rsync -R _site "gs://blog.lawrencejones.dev/branch/${CIRCLE_BRANCH}"
           fi
 
 
