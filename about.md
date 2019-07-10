@@ -23,6 +23,11 @@ content then I'll happily field it at
 These include individual projects, individual efforts that have been adopted by
 my company and work that was done purely within my capacity as an employee.
 
+### [stolon-pgbouncer](https://github.com/gocardless/stolon-pgbouncer)
+
+> stolon-pgbouncer extends a stolon PostgreSQL setup with PgBouncer connection
+> pooling and zero-downtime planned failover of the PostgreSQL primary.
+
 ### [theatre](https://github.com/lawrencejones/theatre)
 
 > This project contains GoCardless Kubernetes extensions, mostly in the form of
