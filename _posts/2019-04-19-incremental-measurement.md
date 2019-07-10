@@ -1,18 +1,20 @@
 ---
 layout: post
 title:  "Avoid time-of-measurement bias with Prometheus"
-date:   "2019-04-19 11:00:00 +0000"
+date:   "2019-07-10 11:00:00 +0000"
 toc:    true
 tags:
   - prometheus
   - observability
 audience: Basic to advanced Prometheus users who use metrics in their work
-goals: Understand time-of-measurement bias, know how a MetricTracer might help
+goals: Understand time-of-measurement bias, know how a Tracer might help
 links:
   - https://gist.github.com/lawrencejones/f419e478106ab1ecbe007e7d9a9ca937
   - https://snapshot.raintank.io/dashboard/snapshot/PFfWQ21fQgeQkF7FGhR4zsiOGOnNFpOr?orgId=2
 excerpt: |
-  TODO
+  Most Prometheus metrics recording durations are subject to a
+  time-of-measurement bias, causing misleading graphs that can derail
+  investigations. See how an open-source Tracer can help solve this problem.
 
 ---
 
@@ -76,11 +78,11 @@ marked with an appropriately alarming red arrow:
 </figure>
 
 As the person debugging this mess, it hurt to see the graph drop to minimal
-activity at the exact time of the incident. I'd already checked the logs so I
-knew the workers were busy- not only that, but the large blue spike at 16:05?
-It's time spent working webhooks, for which we run twenty dedicated workers. How
-could twenty single threaded workers spend 45s per second working, as the graph
-implies?
+activity at the exact time of the incident. This is time spent working webhooks,
+for which we run twenty dedicated workers. I knew from the logs that all the
+workers were busy, so I'd expect the graph to be close to 20s, and yet it almost
+flatlines. More than this, that large blue spike at 16:05? How could twenty
+single threaded workers spend 45s per second working, as the graph implies?
 
 ## Where it went wrong
 
@@ -144,9 +146,7 @@ jobs of varying duration half-normally distributed between 0.1s and some upper
 duration boundary (see
 [seed-jobs](https://gist.github.com/lawrencejones/f419e478106ab1ecbe007e7d9a9ca937#file-seed-jobs)).
 Here are three graphs of reported worker activity, each with increasing job
-durations. As jobs become longer, the bias becomes more noticeable, until in the
-third graph we jump above and below the real measurement (10s of work per
-second) by a huge degree.
+durations.
 
 <figure>
   <img src="{{ "/assets/images/long-tasks-experiment-bias-0_1-1_0.png" | prepend:site.baseurl }}" alt="work by worker with jobs between 0.1s and 1s in duration"/>
@@ -155,12 +155,22 @@ second) by a huge degree.
   </figcaption>
 </figure>
 
+The first graph shows each worker working approximately 1s of work every second,
+as indicated by the flat lines, and the total work equaling our capacity (ten
+workers providing ten seconds of work, every second). This is what we should
+expect regardless of job duration, as constantly occupied workers do just as
+much work per second for short jobs as for long.
+
 <figure>
   <img src="{{ "/assets/images/long-tasks-experiment-bias-0_1-15_0.png" | prepend:site.baseurl }}" alt="work by worker with jobs between 0.1s and 15s in duration"/>
   <figcaption>
     Jobs up to 15s in duration
   </figcaption>
 </figure>
+
+As the job duration increases, our graph becomes messy. We still have ten
+workers and they're still constantly working, but the total work seems to jump
+above and below the available capacity (10s).
 
 <figure>
   <img src="{{ "/assets/images/long-tasks-experiment-bias-0_1-30_0.png" | prepend:site.baseurl }}" alt="work by worker with jobs between 0.1s and 30s in duration"/>
@@ -169,28 +179,27 @@ second) by a huge degree.
   </figcaption>
 </figure>
 
-This biased metric will record no work while we work the longest of jobs, and
-place spikes of activity only after they've subsided.
+With jobs of up-to 30s duration, our measurements become ridiculous. This biased
+metric records no work while we work the longest of jobs, and place spikes of
+activity only after they've subsided.
 
 ## Restoring trust
 
 As if this wasn't bad enough, there's an even more insidious problem with the
-long-lived jobs that so screw with our metrics.
-
-Whenever a long-lived job is terminated, say if Kubernetes evicts the pod or a
-node dies, what happens with the metrics? As we update metrics only after
-completing the job, as far as the metrics are concerned, all that work **never
-happened**.
+long-lived jobs that so screw with our metrics. Whenever a long-lived job is
+terminated, say if Kubernetes evicts the pod or a node dies, what happens with
+the metrics? As we update metrics only after completing the job, as far as the
+metrics are concerned, all that work **never happened**.
 
 Metrics aren't meant to lie to you. Beyond the existential crisis prompted by
 your laptop whispering mistruths, observability tooling that misrepresents the
 state of the world is a trap and not fit-for-purpose.
 
-Thankfully this is fixable. The crux of this bias is that Prometheus taking a
-measurement happens independently of workers updating metrics. If we can ask
-workers to update metrics whenever Prometheus scrapes them, just before they
-return scrape results, then we'll ensure Prometheus is always up-to-date with
-on-going activity.
+Thankfully this is fixable. This bias occurs because Prometheus takes
+measurements independently of workers updating metrics. If we can ask workers to
+update metrics whenever Prometheus scrapes them, just before they return scrape
+results, then we'll ensure Prometheus is always up-to-date with on-going
+activity.
 
 ### Introducing... Tracer
 
@@ -211,9 +220,10 @@ end
 ```
 
 Tracers provide a `trace` method which takes a Prometheus metric and the work
-you want to track. `trace` will execute the given block and guarantee that calls
-to `tracer.collect` during execution will incrementally update the associated
-metric with however long had elapsed since the last call to `collect`.
+you want to track. `trace` will execute the given block (anonymous Ruby
+functions) and guarantee that calls to `tracer.collect` during execution will
+incrementally update the associated metric with however long had elapsed since
+the last call to `collect`.
 
 We need to hook the tracer into the workers to track the job duration and the
 endpoint serving our Prometheus scrape. Starting with workers, we initialise a
@@ -296,9 +306,9 @@ each worker contributing evenly to the reported work.
 
 In comparison to the outright misleading and chaotic graph from our original
 measurements, metrics managed by the tracer are stable and consistent. Not only
-do we accurately assign work to each scrape but we are now indifferent to
-violent worker death: Prometheus will have recorded the metric up until the
-worker disappears, ensuring that work doesn't disappear if the worker goes away.
+do we accurately assign work to each scrape but we are now indifferent to sudden
+worker death: Prometheus will have recorded the metric up until the worker
+disappears, ensuring that work doesn't go unreported if the worker goes away.
 
 ### Can I use this?
 
@@ -332,4 +342,6 @@ requests can get slow, they'll also benefit from using a tracer to track time
 spent working.
 
 As always, any feedback or corrections are welcome- reach out on Twitter or
-[open a PR](https://github.com/lawrencejones/blog.lawrencejones.dev).
+[open a PR](https://github.com/lawrencejones/blog.lawrencejones.dev). If you'd
+like to contribute to the tracer gem, the source code can be found at
+[prometheus-client-tracer-ruby](https://github.com/lawrencejones/prometheus-client-tracer-ruby).
