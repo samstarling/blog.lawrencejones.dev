@@ -16,7 +16,7 @@ within a scale-up organisation.
 
 While I infrequently use Twitter, if you have questions or feedback about the
 content then I'll happily field it at
-[@lawrjone](https://www.twitter.com/lawrjone).
+[@lawrjones](https://www.twitter.com/lawrjones).
 
 ## Open-Source Projects
 
