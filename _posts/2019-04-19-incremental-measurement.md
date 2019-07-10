@@ -16,15 +16,16 @@ excerpt: |
 
 ---
 
-Most applications consist of a web server which handles live traffic and some
-sort of worker tier that can process work asynchronously. There's a lot of great
-advice on how to measure the health of live web traffic, and the community
-continues to develop tools like Prometheus that can help support this
-instrumentation.
+Many web applications consist of a web server which handles live traffic and
+some sort of background worker tier that can process work asynchronously.
+There's a lot of great advice on how to measure the health of live web traffic,
+and the community continues to develop tools like Prometheus that can help
+support this instrumentation.
 
-But looking past web traffic, our workers are often as- if not more- critical to
-service health. We should care about and measure these too, but there's little
-guidance about how to do so while avoiding common pitfalls.
+But looking past web traffic, our workers are often as&mdash;if not
+more&mdash;critical to service health. We should care about and measure these
+too, but there's little guidance about how to do so while avoiding common
+pitfalls.
 
 This post explores one of the pitfalls often found when measuring async work,
 using the example of a production incident where despite having metrics it was
@@ -169,16 +170,17 @@ second) by a huge degree.
 </figure>
 
 This biased metric will record no work while we work the longest of jobs, and
-place spikes of activity only after they've subsided. But as if this wasn't bad
-enough, there's an even more insidious problem with the long-lived jobs that so
-screw with our metrics.
+place spikes of activity only after they've subsided.
+
+## Restoring trust
+
+As if this wasn't bad enough, there's an even more insidious problem with the
+long-lived jobs that so screw with our metrics.
 
 Whenever a long-lived job is terminated, say if Kubernetes evicts the pod or a
 node dies, what happens with the metrics? As we update metrics only after
 completing the job, as far as the metrics are concerned, all that work **never
 happened**.
-
-## Restoring trust
 
 Metrics aren't meant to lie to you. Beyond the existential crisis prompted by
 your laptop whispering mistruths, observability tooling that misrepresents the
@@ -316,6 +318,10 @@ Prometheus::Client.trace(JobWorkedSecondsTotal) do
   sleep(long_time)
 end
 ```
+
+If you find this useful and would like to see a `Tracer` provided with the
+official Prometheus Ruby client, drop your feedback in
+[client_ruby#135](https://github.com/prometheus/client_ruby/pull/135).
 
 # Final thoughts
 
