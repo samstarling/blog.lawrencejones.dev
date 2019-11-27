@@ -16,6 +16,10 @@ redirect_from:
   - 2019/03/07/building-a-postgresql-load-tester.html
 ---
 
+> This post is also available in Russian at [Сборка тестера нагрузки
+> PostgreSQL](https://softdroid.net/sborka-testera-nagruzki-postgresql), thanks
+> to Vladimir for his work!
+
 Some of my recent work at [GoCardless](https://gocardless.com/) uncovered a need
 to benchmark a Postgres cluster. In an attempt to simulate a realistic workload
 I wrote a tool that replays captured Postgres activity against a live server,
