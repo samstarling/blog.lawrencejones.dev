@@ -90,6 +90,7 @@ For the purpose of this post, imagine we have a (fake) service called
 // of which there are two: staging and production.
 service.new('make-it-rain', 'gocardless/make-it-rain') +
 service.mixin.withTeam('banking-integrations') +
+service.mixin.withAlertsChannel('make-it-rain-alerts') +
 service.mixin.withGoogleServices([
   'pubsub.googleapis.com',
 ]) +
@@ -494,13 +495,93 @@ developers lives easier are, I think, appreciated.
 
 ## Monitoring and alerting
 
-- The data structure is well understood, which means you can translate it into
-  other formats
-- Template Prometheus recording rules that create a `gocardless_service` time
-  series with team and alert channel labels, by mapping over services in the
-  registry
-- Now we can automatically join common alerts (Kubernetes pod crash-looping)
-  onto team specific channels, allowing automatic routing of alerts
+As the final case study, it's worth demonstrating how easily a static registry
+can be translated into a totally different medium.
+
+GoCardless now has a lot of services, and a growing number of teams. As teams
+take more operationally responsibility over their services, we're seeing a
+noticeable increase in the number of developers writing Prometheus alerting
+rules for their service.
+
+With increased usage came a pressing issue of alert routing. From the start,
+we've supported routing alerts to a specific Slack channel by providing a
+`channel` label in the alert rule.
+
+For our make-it-rain service, we could direct our alerts to the
+`#make-it-rain-alerts` Slack channel like so:
+
+```yaml
+# Example Prometheus recording rule for a make-it-rain service
+---
+groups:
+  name: make-it-rain
+  rules:
+    - alert: ItsStoppedRaining
+      expr: rate(make_it_rain_coins_fallen_total[1m]) < 1
+      labels:
+        channel: make-it-rain-alerts
+```
+
+I think this is a bit crap, as channels are usually associated with teams, and
+you may forget to change the alert rules if your channel changes. You also need
+to repeat the channel label across all your rules, or have your alert wind up in
+the catch-all `#specialops` alert graveyard.
+
+While I had my personal distaste, we had a more pressing issue than this. Any
+application running in Kubernetes share a number of failure cases, from
+`PodCrashLooping` to `PodPending` and even `PodOOMKilled`. We have common
+definitions for these alerts in every cluster, but couldn't add a `channel`
+label to the common definition as we run many teams services in the same
+cluster, and could only choose one value.
+
+We solved this by creating a new Prometheus recording rule,
+`gocardless_service`, for every service deployment target in our registry. This
+looks something like this:
+
+```yaml
+# service-rules.yaml
+---
+groups:
+  name: gocardless_service
+  rules:
+    - record: gocardless_service
+      expr: "1"
+      labels:
+        service: make-it-rain
+        team: banking-integrations
+        channel: make-it-rain-alerts
+        environment: staging
+        namespace: make-it-rain
+        cluster: compute-staging-brava
+        ...
+```
+
+This effectively uploads our registry into Prometheus, which means we can use
+the rules to dynamically join our alerts onto team routing decisions. Our common
+Prometheus alerts now look like this:
+
+```jsonnet
+// (kube_pod_status_phase{phase="Pending"} == 1)
+// * on(namespace, release) group_left(team, channel) (
+//   gocardless_service{location="local"}
+// )
+{
+  alert: 'KubernetesPodPending',
+  expr: withServiceLabels('kube_pod_status_phase{phase="Pending"} == 1'),
+}
+```
+
+Where the `withServiceLabels` templates the PromQL query in the comment, which
+joins the alert expression onto our registry team and channel mappings, causing
+the alert to be sent directly to the `#make-it-rain-alerts` channel.
+
+We've been happier with this than any of our other alert routing attempts, not
+least because it happens automatically. If you change the alerts channel for a
+service in the registry, Prometheus will immediately adjust and re-route the
+alert elsewhere.
+
+This is just one of the ways we can use this data- we can even alert on any
+resources in our clusters that aren't in the registry, and more besides.
 
 # Closing
 
