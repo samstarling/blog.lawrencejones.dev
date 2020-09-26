@@ -20,7 +20,9 @@ created, rather than describing it.
 
 By creatively distributing the registry so every developer, infrastructure
 component or one-off script has access by default, you'll find use cases for
-this data everywhere.
+this data everywhere. You can even push this data into systems like your
+monitoring stack, allowing automated systems to make decisions on the ownership
+information it provides.
 
 As part of a revamp of our infrastructure tooling, we've introduced a service
 registry into GoCardless. This post explains how we built the registry and some
@@ -28,10 +30,12 @@ of the use cases we've found for it.
 
 # What is it?
 
-The GoCardless service registry is a Jsonnet library, stored as a file inside
-the same Git repository that contains our infrastructure configuration. Jsonnet,
-for those not familiar, is an extension to JSON that aims to support flexible
-reuse and customisation of data structures.
+[jsonnet]: https://jsonnet.org/
+
+The GoCardless service registry is a [Jsonnet][jsonnet] library, stored as a
+file inside the same Git repository that contains our infrastructure
+configuration. Jsonnet, for those not familiar, is an extension to JSON that
+aims to support flexible reuse and customisation of data structures.
 
 Jsonnet files evaluate to JSON, and the service registry is no different:
 
@@ -51,13 +55,13 @@ database, serving the data via a REST API? That wouldn't be strange, and there
 are many systems that do just that, but I'd suggest the approach of a single
 JSON/Jsonnet file has several advantages:
 
-- It's just data, and your registry is only as good as the data you put in it.
-  Especially as you begin, any time building an API or hosting a service is a
-  distraction from establishing the right data model for your infrastructure
-- If you've already adopted Git-ops workflows, tracking changes to the registry
-  in Git should feel very natural
 - JSON files are so universally compatible that you'll be able to use this
   anywhere
+- If you've already adopted Git-ops workflows, tracking changes to the registry
+  in Git should feel very natural
+- It's just data, and your registry is only as good as the data you put in it.
+  Removing the distraction of building an API means you encourage a focus on
+  building the right data model, which is what really matters
 
 From the output of the `jsonnet registry.jsonnet` command, you can see we're
 tracking our Kubernetes `clusters`, any `services` that we run, organisation
@@ -71,8 +75,11 @@ over.
 
 ## Service entry (make-it-rain)
 
+[gist/make-it-rain.json]: https://gist.github.com/lawrencejones/b209a1a5da864b987cbedb1dffef6116#file-make-it-rain-json
+[gist/make-it-rain.jsonnet]: https://gist.github.com/lawrencejones/b209a1a5da864b987cbedb1dffef6116#file-make-it-rain-jsonnet
+
 Our registry began as a list of services, where each service had a
-`metadata.jsonnet` that generated its service entry.
+`metadata.jsonnet` that defined its service entry.
 
 For the purpose of this post, imagine we have a (fake) service called
 `make-it-rain`, which has a service entry that looks like this:
@@ -105,7 +112,7 @@ service.mixin.withEnvironments([
       environment.new('staging') +
       environment.mixin.withGoogleProject('gc-prd-make-it-stag-833e') +
       environment.mixin.withTargets([
-        argocd.new(context='compute-staging-brava', namespace='make-it-rain'),
+        argocd.new(cluster='compute-staging-brava', namespace='make-it-rain'),
       ]),
       // Unlike most services, the production environment should permit
       // a non-engineering team to open consoles. Sometimes we take a
@@ -116,30 +123,34 @@ service.mixin.withEnvironments([
       environment.mixin.rbac.withOperatorsMixin('banking-operations') +
       environment.mixin.withGoogleProject('gc-prd-make-it-prod-1eb1') +
       environment.mixin.withTargets([
-        argocd.new(context='compute-banking', namespace='make-it-rain'),
+        argocd.new(cluster='compute-banking', namespace='make-it-rain'),
       ]),
     ],
   ),
 ])
 ```
 
-Take a moment to read the Jsonnet- this produces a JSON structure that
-you can see [here](TODO). It includes a definition of the service and
-all its environments, with a list of deployment targets for each
-environment that defines where the deployment lives.
+Take a moment to read the Jsonnet- this produces a JSON structure that you can
+see [here][gist/make-it-rain.json]. It includes a definition of the service and
+all its environments, with a list of deployment targets for each environment
+that defines where the deployment lives.
 
 There's some configuration of team permissions and Google Cloud Platform
 references- we'll see how we can use them next.
 
 # Provisioning infrastructure
 
+[terraform]: https://www.terraform.io/
+[chef]: https://www.chef.io/products/chef-infra
+[kubernetes]: https://kubernetes.io/
+
 Once you have a list of service entries like make-it-rain, we can use it
 to tightly integrate with all the rest of our infrastructure tools.
 
-Most infrastructure teams deal with many (in my mind, too many) tools.
-The GoCardless team provisions infrastructure with terraform, manages
-virtual machines with Chef, and Kubernetes and resources with Jsonnet
-templating. Other teams may use far more.
+Most infrastructure teams deal with many (in my mind, too many) tools.  The
+GoCardless team provisions infrastructure with [terraform][terraform], manages
+virtual machines with [Chef][chef], and [Kubernetes][kubernetes] and resources
+with Jsonnet templating. Other teams may use far more.
 
 Thankfully, our service registry is plain ol' JSON, and easily consumed
 by all of these tools. This means we can start using the registry to
@@ -181,9 +192,9 @@ cluster {
 Permissions are one of the more complicated things about managing Kubernetes
 clusters. Especially when aiming for a Devops workflow, with application
 engineers empowered to care for their own Kubernetes resources, you want to
-establish a consistent permission model up-front, as consistent mental models
-allow you to explain your security stance during audits, and help engineers work
-across multiple projects.
+establish a consistent permission model up-front. Consistency means you can
+accurately describe your security stance for audits, and helps maintain
+productivity for engineers who work across multiple teams.
 
 Your registry, being the authoritive definition of service RBAC, can be used to
 power your Kubernetes RBAC and enforce that consistency. Looking at our
@@ -219,10 +230,12 @@ make-it-rain production environment, we can see the RBAC fields:
 ```
 
 We made a decision to model just three roles for a service, viewer, operator and
-admin. We also thought it would be great if all human permission grants were
-derived from these role members, on the service environments.
+admin. We thought it would be great if all permissions granted to humans were
+derived from these member lists, instead of scattering the membership across our
+infrastructure configuration tools (Kubernetes, terraform, Chef).
 
-Now we have this data in the registry, we can:
+Now we have our registry, we can do just that. Using Kubernetes permissions as
+an example, it's simple to:
 
 - Identify the list of teams who are viewers, operators, or admins for any
   services that exist within each cluster namespace
@@ -232,19 +245,10 @@ Now we have this data in the registry, we can:
 We implement this in a single file, `cluster/app/spaces-rbac.jsonnet`, which
 allows us to map over all namespaces in a cluster and provision the
 `RoleBinding` Kubernetes resources. Jsonnet is great for this type of data
-manipulation, proving–yet again!–how using a static registry does not limit your
-ability to manipulate the data.
+manipulation, proving–yet again!–how using a static registry does not limit how
+flexibly you can query the data.
 
 ## Google Cloud Platform
-
-- When every resource is tracked in the registry, you can perform complex
-  queries to project relationships between resources
-- From every service entry, we can find any environments that are linked against
-  a GCP project, then create Google IAM permissions for the users on that
-  service
-- We can create jsonnet files that are views over the registry, and use them to
-  answer questions about what permissions are granted to what people, while
-  allowing the registry to be the authority
 
 It's not just Kubernetes resources in Jsonnet, though. GoCardless is a heavy
 user of Google Cloud Platform, and if this permission model is sound, we should
