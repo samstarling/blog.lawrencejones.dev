@@ -149,8 +149,8 @@ to tightly integrate with all the rest of our infrastructure tools.
 
 Most infrastructure teams deal with many (in my mind, too many) tools.  The
 GoCardless team provisions infrastructure with [terraform][terraform], manages
-virtual machines with [Chef][chef], and [Kubernetes][kubernetes] and resources
-with Jsonnet templating. Other teams may use far more.
+virtual machines with [Chef][chef], and [Kubernetes][kubernetes] resources with
+Jsonnet templating. Other teams may use far more.
 
 Thankfully, our service registry is plain ol' JSON, and easily consumed
 by all of these tools. This means we can start using the registry to
@@ -232,15 +232,15 @@ make-it-rain production environment, we can see the RBAC fields:
 We made a decision to model just three roles for a service, viewer, operator and
 admin. We thought it would be great if all permissions granted to humans were
 derived from these member lists, instead of scattering the membership across our
-infrastructure configuration tools (Kubernetes, terraform, Chef).
+infrastructure configuration (Kubernetes, terraform, Chef).
 
 Now we have our registry, we can do just that. Using Kubernetes permissions as
 an example, it's simple to:
 
 - Identify the list of teams who are viewers, operators, or admins for any
   services that exist within each cluster namespace
-- Use these lists to create `RoleBinding`s in the service namespace, which grant
-  the permissions in practice
+- Use these lists to create `RoleBinding`s in the service namespace, granting
+  appropriate permissions to each member of the roles
 
 We implement this in a single file, `cluster/app/spaces-rbac.jsonnet`, which
 allows us to map over all namespaces in a cluster and provision the
@@ -284,12 +284,17 @@ field:
 }
 ```
 
+[config-connector]: https://cloud.google.com/config-connector/docs/overview
+
 This field means our staging environment is *linked* against the Google project
-with project ID `gc-prd-make-it-stag-833e`. This means GCP resources for this
-environment exist in that Google project- it also means our cluster service will
-provision a [Config Connector](TODO) instance for the `make-it-rain` namespaces,
-allowing developers to provision Google Cloud Resources like a CloudSQL by
-creating Kubernetes resources, something we're finding very useful.
+with project ID `gc-prd-make-it-stag-833e`. This means GCP resources, including
+the IAM memberships, must be provisioned in this Google project.
+
+We also detect a linked Google project, and deploy an instance of the [Config
+Connector][config-connector] for the `make-it-rain` namespace. This allows
+developers to provision Google Cloud Resources (like a CloudSQL instance, of
+BigQuery dataset) like any other Kubernetes resource, all automatically deployed
+through a registry change.
 
 Returning to permissions, this means we know what Google project we need to
 create them in. And from our RBAC, we know who has which viewer, operator, or
@@ -304,9 +309,11 @@ service.mixin.withGoogleServices([
 ]) +
 ```
 
-This tells us that make-it-rain makes use of Google Pub/Sub. Using this, we can
-use some additional config that maps Google services to appropriate IAM
-permissions for each role:
+[google-pubsub]: https://cloud.google.com/pubsub/docs/overview
+
+This tells us that make-it-rain makes use of [Google Pub/Sub][google-pubsub].
+Using this, we can write some Jsonnet that maps Google services to appropriate
+IAM permissions for each role:
 
 ```jsonnet
 // Configure the Google IAM roles we want to bind people of different role
@@ -322,8 +329,14 @@ googleServiceIAMRoles: {
 },
 ```
 
-To compute the final list of Google IAM bindings we need to produce for
-make-it-rain:
+With this, we can implement the registry queries that aggregate these
+permissions into a separate Jsonnet file, `registry-permissions.jsonnet`, inside
+of the registry terraform project. Terraform is far less suited to manipulating
+data than Jsonnet, so we aim to produce whatever structure is easiest for the
+terraform to understand, leading to extremely simple terraform code.
+
+We end up with a simple list of Google groups to Google Cloud Platform IAM
+roles:
 
 ```json
 [
@@ -340,11 +353,8 @@ make-it-rain:
 ]
 ```
 
-We implement the registry queries that aggregate these permissions in a separate
-Jsonnet file, `registry-permissions.jsonnet`, inside of the registry terraform
-project. Terraform is far less suited to manipulating data than Jsonnet, so we
-aim to produce whatever structure is easiest for the terraform to understand,
-leading to extremely simple terraform code:
+Finally, we import these permissions into our terraform, with almost no
+additional data processing required:
 
 ```terraform
 provider "jsonnet" {}
@@ -368,7 +378,7 @@ resource "google_project_iam_member" "permissions" {
 }
 ```
 
-And just like that, we express our GCP permissions using the same data-source
+And just like that, we express our GCP permissions using the same data source
 that powers our Kubernetes RBAC, traced back to the service definition in our
 cannonical registry.
 
@@ -386,7 +396,7 @@ That's what we hope, at any rate!
 So far we've covered provisioning of infrastructure, possibly the most useful
 way to leverage a service registry. But once you use it to create
 infrastructure, the registry becomes a trusted map of everything that exists,
-which can be an awesome help when creating user friendly developer tools.
+which can be a great help when creating user friendly developer tools.
 
 ## Discovery
 
@@ -395,19 +405,24 @@ make the registry truly ubiquitous, we need to provide tools that can fetch a
 registry from anywhere, without requiring additional setup or authentication
 material.
 
-For this, taking inspiration from Google Application Default Credentials, we
-implemented a discovery flow that should work from anywhere. We do this by
-deploying the registry in several places:
+[google-adc]: https://cloud.google.com/docs/authentication/production#automatically
+
+For this, taking inspiration from [Google Application Default
+Credentials][google-adc], we implemented a discovery flow that should work from
+anywhere. We enable this by deploying the registry to several locations:
 
 - For developers, we upload a registry JSON blob to a GCS bucket. Every
   GoCardless developer is authenticated against Google Cloud Platform from their
   local machine, which we can use to grant them access
-- For infrastructure, we place the registry in a globally accessible ConfigMap
+- For infrastructure, we place the registry in a globally accessible `ConfigMap`
   in all of our Kubernetes clusters, and permit access from cluster service
   accounts
 
-This flow is implemented in a Go `pkg/registry`, that can be vendored into any
-Golang app. Using it is as simple as calling:
+We want users to consume the registry from either of these locations
+transparently. For this, we implement the discovery flow in a Golang
+`pkg/registry` that can be vendored into any Golang application.
+
+The interface is as simple as:
 
 ```go
 package registry
@@ -418,7 +433,7 @@ func Discover(context.Context, kitlog.Logger, DiscoverOptions) (*Registry, error
 }
 ```
 
-For those who don't use Go or are writing simple scripts, we rely on a binary
+For those who don't use Go or are writing shell scripts, we rely on a binary
 called `utopia`, a tool we vendor into developer and production runtimes along
 with several other GoCardless specific tools. The binary supports a `utopia
 registry` command, which calls the standard discovery flow and prints the JSON
@@ -440,52 +455,57 @@ So now it's accessible everywhere, what can we do with it?
 ## Improving UX
 
 Like many teams, our maturing Kubernetes expertise encouraged us to break our
-large cluster into many smaller clusters. Where most services used to exist in a
-single cluster, they were now spread across many, and might move depending on
+large cluster into many smaller clusters. Where most services used to live in a
+single cluster, they are now spread across many, and might move depending on
 maintenance or business requirements.
 
-Where our developer tools used to default to a specific cluster, the number of
-teams who could happily rely on the default value was falling day-by-day. In
-addition to cluster, developers needed to understand what namespace their
-service existed in, and often a `release` label.
+Our developer tools used to default to the primary cluster, but this assumption
+was becoming less and less useful as we moved around our workloads. It wasn't
+just what cluster you wanted either: developers needed to understand what
+Kubernetes namespace their service existed in, and often the value of their
+service `release` label.
 
-Together, these parameters were beginning to complicate our developer tools:
+This was beginning to complicate our developer tools:
 
 ```console
 $ anu consoles create \
-  --context <cluster-name> \
-  --namespace <namespace> \
-  --release <release> \
-  ...
+    --context <cluster-name> \
+    --namespace <namespace> \
+    --release <release> \
+    ...
 ```
 
 Application engineers shouldn't need to know our cluster topology from heart-
-that's quite an ask for someone who infrequently has to make changes to these
-configurations. I suspect new joiners were encouraged to type magic values,
-instead of understanding what they were writing, and any maintenance that
-changed them could potentially break many a runbook.
+that's quite an ask for someone who infrequently touches that configuration.  I
+suspect new joiners were encouraged to type magic values they didn't really
+understand, a habit you want to discourage when talking about production
+applications. And whenever maintenance moved a service, it could potentially
+break several runbook.
 
 Developers think in terms of service and environment, not physical location. Our
 registry can help us here- if it's easy to map service and environment to the
 cluster and namespace in which it's deployed, then we can start offering
-interfaces that align with how developer think:
+interfaces that better align with how developers think:
 
 ```console
 # --service can be provided, or automatically inferred from the current repo
 $ utopia consoles create --environment staging -- bash
 ```
 
-And it's not just finding services. The average infrastructure has a load of
-tools that are interconnected in ways that aren't easy to mentally model, but
-are easy to write into a registry like ours.
+And it's not just finding services. Companies our size tend to have many tools
+that are interconnected in ways that aren't obvious, and definitely not
+supported natively by the tools themselves. But with a registry like ours, it's
+easy to encode those connections and provide a much more joined-up experience.
 
-As an example, we run Kibana to provide centralised logging. Service logs are
-routed into various index patterns, which means you need to hit the right index
-pattern for any search to be successful.
+[kibana]: https://www.elastic.co/kibana
+
+As an example, we run [Kibana][kibana] to provide centralised logging. Service
+logs are routed to specific indices, and you need to know what index stores your
+logs to find them via Kibana.
 
 By adding a `loggingIndex` type to our registry, we can easily map a service
-environment to a Kibana index, allowing us to implement a shortcut for jumping
-into a services logs:
+environment to a Kibana index. This provides all the information we need to
+implement a shortcut for jumping into a service's logs:
 
 ```console
 # Open the browser with Kibana at the right index, with filters
@@ -502,9 +522,11 @@ developers lives easier are, I think, appreciated.
 As the final case study, it's worth demonstrating how easily a static registry
 can be translated into a totally different medium.
 
-GoCardless now has a lot of services, and a growing number of teams. As teams
-take more operationally responsibility over their services, we're seeing a
-noticeable increase in the number of developers writing Prometheus alerting
+[prometheus]: https://prometheus.io/
+
+GoCardless has a lot of services, and a growing number of teams. As teams take
+more operational responsibility over their services, we're seeing a noticeable
+increase in the number of developers writing [Prometheus][prometheus] alerting
 rules for their service.
 
 With increased usage came a pressing issue of alert routing. From the start,
@@ -526,19 +548,22 @@ groups:
         channel: make-it-rain-alerts
 ```
 
-I think this is a bit crap, as channels are usually associated with teams, and
-you may forget to change the alert rules if your channel changes. You also need
-to repeat the channel label across all your rules, or have your alert wind up in
-the catch-all `#specialops` alert graveyard.
+This isn't that great, as you may forget to change the alert rules if you
+channel changes. You also need to repeat the channel label across all your
+rules, or have your alert wind up in the catch-all `#specialops` alert
+graveyard- alerts that are silently dropped are never good news.
 
-While I had my personal distaste, we had a more pressing issue than this. Any
-application running in Kubernetes share a number of failure cases, from
-`PodCrashLooping` to `PodPending` and even `PodOOMKilled`. We have common
-definitions for these alerts in every cluster, but couldn't add a `channel`
-label to the common definition as we run many teams services in the same
-cluster, and could only choose one value.
+So while this was sub-par but we could manage, there were some things we
+couldn't support with this system. One specific case were common alerts intended
+to cover more than a single service.
 
-We solved this by creating a new Prometheus recording rule,
+As an example, any applications that run in Kubernetes share a number of failure
+cases, from `PodCrashLooping` to `PodPending` and even `PodOOMKilled`. We have
+common definitions for these alerts in every cluster, but couldn't add a
+`channel` label to the common definition as that would direct all these alerts
+to a single channel, when many teams run services in the same cluster.
+
+Our solution was to create a new Prometheus recording rule,
 `gocardless_service`, for every service deployment target in our registry. This
 looks something like this:
 
@@ -556,6 +581,7 @@ groups:
         channel: make-it-rain-alerts
         environment: staging
         namespace: make-it-rain
+        release: make-it-rain
         cluster: compute-staging-brava
         ...
 ```
@@ -592,10 +618,10 @@ resources in our clusters that aren't in the registry, and more besides.
 At GoCardless, we're about to release a total reimagining of our infrastructure
 tooling, and the service registry has been an essential piece of that puzzle.
 
-Once you have a registry, you start thinking about solutions to problems you
-didn't even realise existed. When you start orienting teams around that data
-model, you can encourage consistency and benefit from a shared mental model of
-your infrastructure.
+Once you have a registry, you start seeing solutions to problems you didn't even
+realise existed. When you start orienting teams around that data model, you can
+encourage consistency and benefit from a shared mental model of your
+infrastructure.
 
 This post describes some of the benefits we've seen, and solutions to problems I
 think most engineering orgs of our size experience. I encourage people to give
