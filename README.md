@@ -9,6 +9,9 @@ experience.
 Merging to master triggers CircleCI to deploy any changes. The site is hosted
 using Google Cloud Storage with Cloudflare for DNS and SSL.
 
+We use [Type Theme](https://github.com/rohanchandra/type-theme) for the CSS,
+layouts, etc. Check their README for documentation on the `_config.yml`.
+
 ## Upcoming
 
 - pgreplay-go: realistic Postgres performance testing
