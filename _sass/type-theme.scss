@@ -29,3 +29,8 @@ figure > figcaption {
   text-align: center;
   margin-bottom: 14px;
 }
+
+// Allows us to squeeze 72 characters into the blog content
+pre {
+  font-size: 0.9em; // 1em -> 0.9em
+}
