@@ -14,15 +14,15 @@ Building a service registry, a structure that tracks all people, services and
 systems that interact with your infrastructure, can be extremely powerful.
 
 If you pick the right format, it can be the glue between totally distinct
-toolchains. Placing the registy at the heart of all your other tools, you no
-longer need to worry about keeping it up-to-date: the registry defines what is
-created, rather than describing it.
+toolchains. Placing the registry at the heart of all your other tools means you
+no longer need to worry about keeping it up-to-date: the registry defines what
+is created, rather than describing it.
 
-By creatively distributing the registry so every developer, infrastructure
-component or one-off script has access by default, you'll find use cases for
-this data everywhere. You can even push this data into systems like your
-monitoring stack, allowing automated systems to make decisions on the ownership
-information it provides.
+By distributing the registry so every developer, infrastructure component or
+one-off script can easily read it, you'll find use cases for this data
+everywhere. You can even push this data into systems like your monitoring stack,
+allowing automated systems to make decisions on the ownership information it
+provides.
 
 As part of a revamp of our infrastructure tooling, we've introduced a service
 registry into GoCardless. This post explains how we built the registry and some
@@ -52,8 +52,9 @@ $ jsonnet registry.jsonnet
 
 Perhaps you thought a service registry was a webserver, maybe hooked up to a
 database, serving the data via a REST API? That wouldn't be strange, and there
-are many systems that do just that, but I'd suggest the approach of a single
-JSON/Jsonnet file has several advantages:
+are many systems that do just that, but I'd suggest the approach of building a
+registry out of a single JSON file (compiled from whatever templating language
+you choose, be it Jsonnet or otherwise) has several advantages:
 
 - JSON files are so universally compatible that you'll be able to use this
   anywhere
@@ -152,9 +153,19 @@ GoCardless team provisions infrastructure with [terraform][terraform], manages
 virtual machines with [Chef][chef], and [Kubernetes][kubernetes] resources with
 Jsonnet templating. Other teams may use far more.
 
-Thankfully, our service registry is plain ol' JSON, and easily consumed
-by all of these tools. This means we can start using the registry to
-define, not just describe, what infrastructure we create.
+Thankfully, our service registry is plain ol' JSON, and easily consumed by all
+of these tools. Once imported, we can begin provisioning infrastructure in
+response to changes in the registry. This is a change from the registry
+describing the infrastructure at a point-in-time, to becoming the definition
+what really exists.
+
+When you must update registry to create infrastructure, you guarantee the
+registry is up-to-date, and know it can no longer become stale. This allows you
+to trust the registry in use-cases that weren't possible if it could fall
+out-of-date, a benefit we'll see when we integrate it with our
+[tools](#tooling).
+
+Let's see how this works in practice.
 
 ## Kubernetes
 
@@ -196,8 +207,8 @@ establish a consistent permission model up-front. Consistency means you can
 accurately describe your security stance for audits, and helps maintain
 productivity for engineers who work across multiple teams.
 
-Your registry, being the authoritive definition of service RBAC, can be used to
-power your Kubernetes RBAC and enforce that consistency. Looking at our
+Your registry, being the authoritative definition of service RBAC, can be used
+to power your Kubernetes RBAC and enforce that consistency. Looking at our
 make-it-rain production environment, we can see the RBAC fields:
 
 ```json
@@ -230,7 +241,8 @@ make-it-rain production environment, we can see the RBAC fields:
 ```
 
 We made a decision to model just three roles for a service, viewer, operator and
-admin. We thought it would be great if all permissions granted to humans were
+admin- from our experience, it seems this is flexible enough for almost all use
+cases. We thought it would be great if all permissions granted to humans were
 derived from these member lists, instead of scattering the membership across our
 infrastructure configuration (Kubernetes, terraform, Chef).
 
@@ -413,7 +425,9 @@ anywhere. We enable this by deploying the registry to several locations:
 
 - For developers, we upload a registry JSON blob to a GCS bucket. Every
   GoCardless developer is authenticated against Google Cloud Platform from their
-  local machine, which we can use to grant them access
+  local machine, which we can use to grant them access. We'll rely on registry
+  access for several essential tools: we might have chosen to pull the file from
+  our Github repo, but suspect GCS might be a bit more reliable 🙈
 - For infrastructure, we place the registry in a globally accessible `ConfigMap`
   in all of our Kubernetes clusters, and permit access from cluster service
   accounts
@@ -480,12 +494,12 @@ that's quite an ask for someone who infrequently touches that configuration.  I
 suspect new joiners were encouraged to type magic values they didn't really
 understand, a habit you want to discourage when talking about production
 applications. And whenever maintenance moved a service, it could potentially
-break several runbook.
+break several runbooks.
 
-Developers think in terms of service and environment, not physical location. Our
-registry can help us here- if it's easy to map service and environment to the
-cluster and namespace in which it's deployed, then we can start offering
-interfaces that better align with how developers think:
+Developers at GoCardless think in terms of service and environment, not physical
+location. Our registry can help us here- if it's easy to map service and
+environment to the cluster and namespace in which it's deployed, then we can
+start offering interfaces that better align with how developers think:
 
 ```console
 # --service can be provided, or automatically inferred from the current repo
@@ -498,14 +512,15 @@ supported natively by the tools themselves. But with a registry like ours, it's
 easy to encode those connections and provide a much more joined-up experience.
 
 [kibana]: https://www.elastic.co/kibana
+[elasticsearch]: https://www.elastic.co/elasticsearch/
 
-As an example, we run [Kibana][kibana] to provide centralised logging. Service
-logs are routed to specific indices, and you need to know what index stores your
-logs to find them via Kibana.
+As an example, we run [Kibana][kibana] and [Elasticsearch][elasticsearch] to
+provide centralised logging. Service logs are routed to specific indices, and
+you need to know what index stores your logs to find them via Kibana.
 
 By adding a `loggingIndex` type to our registry, we can easily map a service
-environment to a Kibana index. This provides all the information we need to
-implement a shortcut for jumping into a service's logs:
+environment to a Kibana index pattern. This provides all the information we need
+to implement a shortcut for jumping into a service's logs:
 
 ```console
 # Open the browser with Kibana at the right index, with filters
@@ -548,7 +563,7 @@ groups:
         channel: make-it-rain-alerts
 ```
 
-This isn't that great, as you may forget to change the alert rules if you
+This isn't that great, as you may forget to change the alert rules if your
 channel changes. You also need to repeat the channel label across all your
 rules, or have your alert wind up in the catch-all `#specialops` alert
 graveyard- alerts that are silently dropped are never good news.
@@ -620,7 +635,7 @@ tooling, and the service registry has been an essential piece of that puzzle.
 
 Once you have a registry, you start seeing solutions to problems you didn't even
 realise existed. When you start orienting teams around that data model, you can
-encourage consistency and benefit from a shared mental model of your
+**encourage consistency** and **benefit from a shared mental model** of your
 infrastructure.
 
 This post describes some of the benefits we've seen, and solutions to problems I
