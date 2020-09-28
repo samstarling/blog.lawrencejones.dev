@@ -62,9 +62,9 @@ jobs:
       - attach_workspace: {at: ~/blog}
       - run: |
           if [[ $CIRCLE_BRANCH == "master" ]]; then
-            gsutil -m -h "Cache-Control:public, must-revalidate" rsync -R _site "gs://blog.lawrencejones.dev"
+            gsutil -m -h "Cache-Control: no-store" rsync -R _site "gs://blog.lawrencejones.dev"
           else
-            gsutil -m -h "Cache-Control:public, must-revalidate" rsync -R _site "gs://blog.lawrencejones.dev/branch/${CIRCLE_BRANCH}"
+            gsutil -m -h "Cache-Control: no-store" rsync -R _site "gs://blog.lawrencejones.dev/branch/${CIRCLE_BRANCH}"
           fi
 
 
