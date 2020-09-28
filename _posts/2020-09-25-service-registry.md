@@ -6,7 +6,10 @@ tags:
   - infrastructure
 excerpt: |
   As a teams infrastructure estate grows, it becomes increasingly beneficial to
-  create a global registry of all people, services and components.
+  create a global registry of all people, services and components. Once you do,
+  you'll start seeing solutions to problems you didn't even know existed, and
+  benefit from a consistent mental model of your infrastructure that you can
+  share across teams.
 
 ---
 
