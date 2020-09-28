@@ -16,7 +16,7 @@ theme_settings:
   title: Lawrence Jones
   avatar:
   favicon: assets/favicon.ico
-  gravatar:  # Email MD5 hash
+  gravatar: a3d694b39e0e33fc479832b00dc128dc
   description: >
     Building reliable infrastructure for GoCardless, a fast-growing fintech
     based in London. Focused on tackling infrastructure problems with a software
