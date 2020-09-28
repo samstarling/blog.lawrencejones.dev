@@ -1,0 +1,3 @@
+[submodule "gists/service-registry"]
+	path = gists/service-registry
+	url = git@gist.github.com:b209a1a5da864b987cbedb1dffef6116.git
