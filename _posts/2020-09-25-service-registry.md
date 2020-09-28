@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Why you need a service registry"
-date:   "2020-09-25 12:00:00 +0000"
+date:   "2020-09-28 12:00:00 +0000"
 tags:
   - infrastructure
 excerpt: |
