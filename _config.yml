@@ -26,7 +26,7 @@ theme_settings:
   header_text:
   header_text_feature_image:
   footer_text: >
-    © 2020 Lawrence Jones. Powered by <a href="https://jekyllrb.com/">Jekyll</a> & <a href="https://github.com/rohanchandra/type-theme">Type Theme</a>
+    © 2020 Lawrence Jones
 
   # Icons
   rss: true
