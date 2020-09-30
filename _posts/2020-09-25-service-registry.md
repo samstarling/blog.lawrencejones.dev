@@ -4,12 +4,22 @@ title:  "Why you need a service registry"
 date:   "2020-09-28 12:00:00 +0000"
 tags:
   - infrastructure
+  - terraform
+  - chef
+  - kubernetes
+  - google-cloud-platform
 excerpt: |
-  As a teams infrastructure estate grows, it becomes increasingly beneficial to
-  create a global registry of all people, services and components. Once you do,
-  you'll start seeing solutions to problems you didn't even know existed, and
-  benefit from a consistent mental model of your infrastructure that you can
-  share across teams.
+  <p>
+    As a team's infrastructure estate grows, it becomes increasingly beneficial
+    to create a global registry of all people, services, and components. Once
+    you do, you can integrate with tools like terraform, Chef, and Kubernetes to
+    help provision your infrastructure according to a single authoritative
+    source.
+  </p>
+  <p>
+    This post explains how GoCardless built their registry, and some of the uses
+    we’ve put it to.
+  </p>
 
 ---
 

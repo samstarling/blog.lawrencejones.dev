@@ -6,10 +6,12 @@ tags:
   - gocardless
 external_url: "https://gocardless.com/blog/coach/"
 excerpt: |
-  Today we're open sourcing Coach, a library that removes the complexity from
-  Rails controllers. Bundle your shared behaviour into highly robust, heavily
-  tested middlewares and rely on Coach to join them together, providing static
-  analysis over the entire chain. Coach ensures you only require a glance to see
-  what's being run on each controller endpoint.
+  <p>
+    Today we're open sourcing Coach, a library that removes the complexity from
+    Rails controllers. Bundle your shared behaviour into highly robust, heavily
+    tested middlewares and rely on Coach to join them together, providing static
+    analysis over the entire chain. Coach ensures you only require a glance to
+    see what's being run on each controller endpoint.
+  </p>
 
 ---

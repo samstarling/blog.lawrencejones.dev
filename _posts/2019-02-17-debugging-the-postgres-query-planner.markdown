@@ -7,8 +7,10 @@ tags:
   - postgres
 external_url: "https://gocardless.com/blog/debugging-the-postgres-query-planner/"
 excerpt: |
-  Diving into the Postgres query planner to understand its decisions- and
-  occasionally- its mistakes. Explore a query plan that went wrong, discovering
-  the statistics that informed the bad decision.
+  <p>
+    Diving into the Postgres query planner to understand its decisions- and
+    occasionally- its mistakes. Explore a query plan that went wrong,
+    discovering the statistics that informed the bad decision.
+  </p>
 
 ---

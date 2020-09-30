@@ -12,9 +12,11 @@ links:
   - https://gist.github.com/lawrencejones/f419e478106ab1ecbe007e7d9a9ca937
   - https://snapshot.raintank.io/dashboard/snapshot/PFfWQ21fQgeQkF7FGhR4zsiOGOnNFpOr?orgId=2
 excerpt: |
-  Most Prometheus metrics recording durations are subject to a
-  time-of-measurement bias, causing misleading graphs that can derail
-  investigations. See how an open-source Tracer can help solve this problem.
+  <p>
+    Most Prometheus metrics recording durations are subject to a
+    time-of-measurement bias, causing misleading graphs that can derail
+    investigations. See how an open-source Tracer can help solve this problem.
+  </p>
 
 ---
 

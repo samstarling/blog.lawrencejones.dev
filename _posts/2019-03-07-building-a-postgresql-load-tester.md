@@ -6,10 +6,12 @@ date:   "2019-04-07 11:00:00 +0000"
 tags:
   - postgres
 excerpt: |
-  This post covers the implementation of pgreplay-go, a tool to realistically
-  simulate captured Postgres traffic. I'll explain why existing tools didn't fit
-  and explain some challenges in the implementation, focusing on what I learned
-  personally from the process.
+  <p>
+    This post covers the implementation of pgreplay-go, a tool to realistically
+    simulate captured Postgres traffic. I'll explain why existing tools didn't
+    fit and explain some challenges in the implementation, focusing on what I
+    learned personally from the process.
+  </p>
 
 # Originally posted to this link, preserve for posterity
 redirect_from:
