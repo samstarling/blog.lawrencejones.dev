@@ -91,7 +91,6 @@ theme_settings:
       - https://use.fontawesome.com/releases/v5.8.2/webfonts/fa-brands-400.woff2
       - https://use.fontawesome.com/releases/v5.8.2/webfonts/fa-solid-900.woff2
 
-
   # Post navigation
   post_navigation: false
 
