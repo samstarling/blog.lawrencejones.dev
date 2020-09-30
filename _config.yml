@@ -74,6 +74,24 @@ theme_settings:
   # Open the "_sass > base" folder, and open "_variables.scss"
   google_fonts: "Source+Sans+Pro:400,700,700italic,400italic"
 
+  # Reload these by running:
+  # make font-urls
+  google_font_urls:
+    - https://fonts.gstatic.com/s/sourcesanspro/v14/6xK1dSBYKcSV-LCoeQqfX1RYOo3qPZ7nsDc.ttf
+    - https://fonts.gstatic.com/s/sourcesanspro/v14/6xKwdSBYKcSV-LCoeQqfX1RYOo3qPZZclSds18E.ttf
+    - https://fonts.gstatic.com/s/sourcesanspro/v14/6xK3dSBYKcSV-LCoeQqfX1RYOo3qOK7g.ttf
+    - https://fonts.gstatic.com/s/sourcesanspro/v14/6xKydSBYKcSV-LCoeQqfX1RYOo3ig4vwlxdr.ttf
+
+  # Whenever we change font awesome version, we should check what font files are
+  # loaded to update the list of preloads.
+  font_awesome:
+    href: https://use.fontawesome.com/releases/v5.8.2/css/all.css
+    integrity: sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay
+    preload_urls:
+      - https://use.fontawesome.com/releases/v5.8.2/webfonts/fa-brands-400.woff2
+      - https://use.fontawesome.com/releases/v5.8.2/webfonts/fa-solid-900.woff2
+
+
   # Post navigation
   post_navigation: false
 
