@@ -5,6 +5,11 @@
     content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.theme_settings.description }}{% endif %}">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <!-- If this is an external_url, we want to redirect -->
+  {% if page.external_url %}
+  <meta http-equiv="refresh" content="0;url={{ page.external_url }}">
+  {% endif %}
+
   <!-- Preload Google fonts, which is defined in sass -->
   {% for font_url in site.theme_settings.google_font_urls %}
   <link rel="preload" as="font" crossorigin href="{{ font_url }}">

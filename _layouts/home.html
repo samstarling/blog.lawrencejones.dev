@@ -15,7 +15,13 @@ layout: default
     <div class="post-teaser">
       <header>
         <h1>
-          <a class="post-link" href="{{ post.url | relative_url }}">
+          <a class="post-link"
+            {% if post.external_url %}
+              href="{{ post.external_url }}"
+            {% else %}
+              href="{{ post.url | relative_url }}"
+            {% endif %}
+            >
             {{ post.title }}
           </a>
         </h1>
@@ -25,7 +31,13 @@ layout: default
       </header>
       <div class="excerpt">
         {{ post.excerpt }}
-        <a class="button" href="{{ post.url | relative_url }}">
+        <a class="button"
+          {% if post.external_url %}
+            href="{{ post.external_url }}"
+          {% else %}
+            href="{{ post.url | relative_url }}"
+          {% endif %}
+        >
           {{ site.theme_settings.str_continue_reading }}
         </a>
       </div>
