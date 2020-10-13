@@ -23,11 +23,8 @@
   <!-- CSS -->
   <link rel="stylesheet" href="{{ "/assets/css/main.css" | relative_url }}">
 
-  <!--Favicon-->
+  <!-- Favicon -->
   <link rel="shortcut icon" href="{{ site.baseurl }}/{{ site.theme_settings.favicon }}" type="image/x-icon">
-
-  <!-- Canonical -->
-  <link rel="canonical" href="{{ page.url | replace:'index.html','' | relative_url }}">
 
   <!-- RSS -->
   <link rel="alternate" type="application/atom+xml" title="{{ site.theme_settings.title }}"
@@ -64,5 +61,11 @@
       ga('send', 'pageview');
     </script>
     <script async src='https://www.google-analytics.com/analytics.js'></script>
+  {% endif %}
+
+  {% if page.title %}
+    {% seo %}
+  {% else %}
+    <link rel="canonical" href="{{ page.url | replace:'index.html','' | relative_url }}">
   {% endif %}
 </head>

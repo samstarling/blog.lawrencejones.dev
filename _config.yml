@@ -6,6 +6,10 @@
 url: "https://blog.lawrencejones.dev"
 baseurl: ""
 
+# Used by jekyll-seo-tags
+twitter:
+  username: lawrjones
+
 # Don't use the default /yyyy/mm/dd/title permalink to avoid breaking links when
 # you change publish date.
 permalink: /:categories/:title/
@@ -109,6 +113,7 @@ plugins:
   - jekyll-paginate
   - jekyll-redirect-from
   - jekyll-toc
+  - jekyll-seo-tag
   - jekyll-sitemap
 exclude:
   - Gemfile

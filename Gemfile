@@ -11,4 +11,10 @@ group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.15"
   gem "jekyll-paginate"
   gem "jekyll-sitemap"
+  gem "jekyll-seo-tag"
+end
+
+group :development do
+  gem "pry"
+  gem "pry-byebug"
 end
