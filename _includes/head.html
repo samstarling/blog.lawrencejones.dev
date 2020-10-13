@@ -71,6 +71,6 @@
   {% if page.title %}
     {% seo %}
   {% else %}
-    <link rel="canonical" href="{{ page.url | replace:'index.html','' | relative_url }}">
+    <link rel="canonical" href="{{ page.url | replace:'index.html','' | absolute_url }}">
   {% endif %}
 </head>
