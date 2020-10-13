@@ -109,6 +109,7 @@ plugins:
   - jekyll-paginate
   - jekyll-redirect-from
   - jekyll-toc
+  - jekyll-sitemap
 exclude:
   - Gemfile
   - Gemfile.lock
