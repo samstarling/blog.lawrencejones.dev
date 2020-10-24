@@ -74,5 +74,12 @@ workflows:
     jobs:
       - build
       - deploy:
+          filters:
+            # I suspect that deploying branch builds is hurting SEO, as Google
+            # manages to crawl these pages too. Better to preview locally
+            # anyway.
+            branches:
+              only:
+                - master
           requires:
             - build
