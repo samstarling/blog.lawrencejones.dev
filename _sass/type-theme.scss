@@ -37,3 +37,10 @@ figure > figcaption {
 pre {
   font-size: 0.9em; // 1em -> 0.9em
 }
+
+// Cause subsequent lines in a multi-line bullet point to be aligned with the
+// first, by placing the bullet marker outside of the list.
+ul {
+  list-style-position: outside;
+  margin-left: 24px; // bump the list markers back inline with the rest of text
+}
