@@ -2,6 +2,7 @@
 layout: post
 title:  "An incident response starter-pack: how do you handle production outages?"
 date:   "2020-10-27 09:00:00 +0000"
+image:  /assets/images/incident-response-email.png
 tags:
   - incident-response
   - sre
