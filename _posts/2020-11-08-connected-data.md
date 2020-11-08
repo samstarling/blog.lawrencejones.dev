@@ -434,3 +434,5 @@ us prioritise 2-4 weeks of a teams engineering time, which is a pretty insane
 return on investment.
 
 Hopefully you find this as cool as I do.
+
+_Discuss this post on [Hackernews](https://news.ycombinator.com/item?id=25027030)._
