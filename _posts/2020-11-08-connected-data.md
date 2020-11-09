@@ -381,7 +381,6 @@ display: none with no src, using JS to configure the src and switch the two
 elements if it runs.
 
 This allows for compatibility with no-JS users.
-!-->
 <figure>
   <iframe
     id="graph-iframe"
@@ -403,6 +402,21 @@ This allows for compatibility with no-JS users.
     image.remove();
   </script>
 
+  <figcaption>
+    Graph of API work spent on webhooks vs. total work
+  </figcaption>
+</figure>
+!-->
+
+<!--
+The above iframe doesn't work when you don't have cookies for some reason.
+Reverting back to the image.
+!-->
+<figure>
+  <img
+      id="graph-image"
+      src="{{ "/assets/images/connected-data-graph.png" | prepend:site.baseurl }}"
+      alt="Graph of API work spent on webhooks vs. total work"/>
   <figcaption>
     Graph of API work spent on webhooks vs. total work
   </figcaption>
