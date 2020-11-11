@@ -134,7 +134,7 @@ Now we explore our data to see how we can use this.
 
 The thrust of this article is that a connected dataset is worth more than the
 sum of its parts. By exporting such a variety of data sources in BigQuery, we
-can combine them ways that aren’t practical to predict in advance.
+can combine them in ways that aren’t practical to predict in advance.
 
 We’ll combine two such sources to answer our question: the `webhooks` table of
 our relational Postgres database, and HTTP request logs.
