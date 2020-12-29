@@ -273,3 +273,5 @@ few minutes of napkin maths to decide either way.
 I hope this case study prompts consideration of compression outside of standard,
 boring use-cases, and helps to find opportunities where you can apply it to your
 own systems.
+
+_Discuss this post on [Hackernews](https://news.ycombinator.com/item?id=25573605)._
