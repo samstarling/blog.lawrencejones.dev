@@ -4,3 +4,6 @@
 [submodule "gists/connected-data"]
 	path = gists/connected-data
 	url = git@gist.github.com:5850c75ecdcbb77492c9e37d11076643.git
+[submodule "gists/compress-everything"]
+	path = gists/compress-everything
+	url = git@gist.github.com:25fda1c6c4d945bef0570eed1e80c9a2.git
