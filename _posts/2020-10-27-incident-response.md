@@ -6,6 +6,7 @@ image:  /assets/images/incident-response-email.png
 tags:
   - incident-response
   - sre
+hackernews: https://news.ycombinator.com/item?id=24906103
 excerpt: |
   <p>
     Tips-and-tricks to better handle incidents, learned over years of dealing
@@ -207,5 +208,3 @@ make before an incident occurs, or any trade-offs like security vs
 data-integrity, vs availability. If you’re interested in hearing my opinions on
 these, please do tweet me ([@lawrjones][@lawrjones]) and I’ll be delighted to
 share!_
-
-_Discuss this post on [Hackernews](https://news.ycombinator.com/item?id=24906103)._

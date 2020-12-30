@@ -6,6 +6,7 @@ toc:    true
 tags:
   - prometheus
   - observability
+hackernews: https://news.ycombinator.com/item?id=20411687
 audience: Basic to advanced Prometheus users who use metrics in their work
 goals: Understand time-of-measurement bias, know how a Tracer might help
 links:

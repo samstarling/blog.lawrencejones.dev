@@ -5,6 +5,7 @@ toc:    true
 date:   "2019-04-07 11:00:00 +0000"
 tags:
   - postgres
+hackernews: https://news.ycombinator.com/item?id=19605425
 excerpt: |
   <p>
     This post covers the implementation of pgreplay-go, a tool to realistically

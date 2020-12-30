@@ -8,6 +8,7 @@ tags:
   - chef
   - kubernetes
   - google-cloud-platform
+hackernews: https://news.ycombinator.com/item?id=24616442
 excerpt: |
   <p>
     As a team's infrastructure estate grows, it becomes increasingly beneficial
@@ -654,5 +655,3 @@ infrastructure.
 This post describes some of the benefits we've seen, and solutions to problems I
 think most engineering orgs of our size experience. I encourage people to give
 this a go- you might just like it, too.
-
-_Discuss this post on [Hackernews](https://news.ycombinator.com/item?id=24616442)._

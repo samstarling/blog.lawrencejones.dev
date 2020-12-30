@@ -10,7 +10,18 @@ layout: default
       {% if page.author %} - {{ page.author }}{% endif %}
     </p>
   </header>
-  <section class="post-content">{{ content }}</section>
+  <section class="post-content">
+    {{ content }}
+
+    {% if page.hackernews %}
+    <p>
+      <em>
+        Discuss this post on
+        <a target="_blank" href="{{ page.hackernews }}">Hackernews</a>.
+      </em>
+    </p>
+    {% endif %}
+  </section>
 </article>
 
 <!-- Disqus -->
