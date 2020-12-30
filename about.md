@@ -5,24 +5,54 @@ permalink: /about/
 feature-img: assets/images/feature-espressocrema.jpg
 ---
 
-I'm Lawrence, a Site Reliability Engineer at GoCardless. My team focuses on
-scaling our payments API across the globe while providing a reliable and robust
-service to our customers.
+[gocardless]: https://gocardless.com/
+[me@twitter]: https://www.twitter.com/lawrjones
+[me@mailto]: mailto:lawrjone@gmail.com?subject=Hey!
 
-My writing will centre around the technical challenges I face on my day-to-day.
-You can expect to see posts about Postgres, Kubernetes and general engineering
-problems that find their way to an SREs desk. Hopefully this can become a
-platform for sharing the more interesting technical highlights of an SREs role
-within a scale-up organisation.
+My name is Lawrence and I'm a Principal Engineer at [GoCardless][gocardless],
+where I help build our global recurring payments platform.
 
-While I infrequently use Twitter, if you have questions or feedback about the
-content then I'll happily field it at
-[@lawrjones](https://www.twitter.com/lawrjones).
+My last few years have been spent working in infrastructure as an SRE, with
+lofty ambitions of building a self-service platform with minimal reinvented
+wheels.
+
+Around this, I've worked in and with a number of teams building the GoCardless
+product. This meant optimising payment pipelines, amateur contributions to
+machine-learning models, and being forced to develop skills and opinions around
+how to build and lead engineering teams.
+
+This blog is about sharing what I've learned so other people can benefit, and
+getting better at doing that sharing. The themes will be drawn from my work, so
+expect technical subjects like Postgres and Kubernetes and the occasional
+tech-lead theme like incident response or onboarding.
+
+If you enjoy what I write, send me an [email][me@mailto] or grab me on Twitter
+[@lawrjones][me@twitter]. I love understanding other people's perspective and am
+always up for a (remote or otherwise!) coffee.
 
 ## Open-Source Projects
 
-These include individual projects, individual efforts that have been adopted by
-my company and work that was done purely within my capacity as an employee.
+For an idea of what I've worked on, here's a list of projects that I've worked
+on which I've been able to open-source.
+
+These include individual projects, personal efforts that have been adopted by my
+company, and work that was done purely within my capacity as an employee.
+
+### [pgsink](https://github.com/lawrencejones/pgsink)
+
+> pgsink is a Postgres change-capture device that supports high-throughput and
+> low-latency capture to a variety of sinks.
+>
+> - **Simplicity**: by default, everything will just work
+> - **Performance**: even extremely high volume or large Postgres databases should
+>   be streamable, without impact to existing database work
+> - **Durability**: no update should be lost
+
+Npt yet complete, but on a slow and steady march to v1. I expect other tools to
+speed past me before I ever get there, but I'll only make this public when it's
+really worth considering using.
+
+Watch this space!
 
 ### [stolon-pgbouncer](https://github.com/gocardless/stolon-pgbouncer)
 
