@@ -8,7 +8,7 @@ tags:
   - golang
   - binary
   - javascript
-hackernews: TODO
+hackernews: https://news.ycombinator.com/item?id=26157483
 excerpt: |
   <p>
     The upcoming Golang embed directive can help distribute applications that
