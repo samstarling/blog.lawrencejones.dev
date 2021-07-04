@@ -144,6 +144,7 @@ doing.
 
 <figure>
   <img
+      style="max-width: 80%"
       src="{{ "/assets/images/working-too-hard-no-idea.jpg" | prepend:site.baseurl }}"
       alt="I Have No Idea What I'm Doing"/>
   <figcaption>

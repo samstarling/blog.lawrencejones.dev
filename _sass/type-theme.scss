@@ -31,6 +31,13 @@ figure > figcaption {
   font-style: italic;
   text-align: center;
   margin-bottom: 14px;
+  margin-top: 8px;
+}
+
+// Center img within a figure
+figure > img {
+  display: block;
+  margin: auto;
 }
 
 // Allows us to squeeze 72 characters into the blog content
