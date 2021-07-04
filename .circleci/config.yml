@@ -9,21 +9,21 @@ references:
 
   cache_bundle_for_lockfile: &cache_bundle_for_lockfile
     save_cache:
-      key: ruby2.7.1-Gemfile-{{ checksum "Gemfile.lock" }}
+      key: ruby3.0.1-Gemfile-{{ checksum "Gemfile.lock" }}
       paths:
         - vendor/bundle
 
   cache_bundle: &cache_bundle
     save_cache:
-      key: ruby2.7.1-Gemfile
+      key: ruby3.0.1-Gemfile
       paths:
         - vendor/bundle
 
   restore_bundle: &restore_bundle
     restore_cache:
       keys:
-        - ruby2.7.1-Gemfile-{{ checksum "Gemfile.lock" }}
-        - ruby2.7.1-Gemfile
+        - ruby3.0.1-Gemfile-{{ checksum "Gemfile.lock" }}
+        - ruby3.0.1-Gemfile
 
 jobs:
   build:
