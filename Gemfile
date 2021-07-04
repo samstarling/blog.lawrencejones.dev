@@ -17,4 +17,5 @@ end
 group :development do
   gem "pry"
   gem "pry-byebug"
+  gem "webrick"  # Ruby 3.0 drops this from stdlib
 end
