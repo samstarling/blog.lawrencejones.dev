@@ -9,7 +9,7 @@ tags:
   - lifestyle
   - mentorship
   - start-ups
-hackernews: TODO
+hackernews: https://news.ycombinator.com/item?id=27729987
 excerpt: |
   <p>
     Working hard is a great way to accelerate learning, but it can come at a
