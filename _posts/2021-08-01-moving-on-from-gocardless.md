@@ -157,8 +157,8 @@ achievable by leveraging experience across the entire company. Whatever we built
 had to intuitively support our existing product use cases, while catering for a
 load of future ambitions we know we’ll want to explore.
 
-In many ways, designing evolving into Billing Requests was similar to how Stripe
-describe their [payment API
+In many ways, arriving at the design for Billing Requests was a similar process
+to how Stripe describe their [payment API
 evolution](https://stripe.com/blog/payment-api-design), and was no mean feat.
 
 Releasing such impactful products at pace is a testament to the GoCardless
@@ -179,10 +179,16 @@ imagine where I’d be without it.
 But if it sucks to leave a company you love so much, the one upside is you only
 do it for an opportunity you can’t resist.
 
+[pete]: https://twitter.com/peterejhamilton
+[lisa]: https://twitter.com/paprikati_eng
+[chris]: https://twitter.com/evnsio
+[stephen]: https://twitter.com/sjwhitworth
+
 So with that in mind… I’m excited to say that starting Monday, I’ll be joining
-Pete, Stephen, Chis and Lisa at [incident.io](https://incident.io/), where we’ll
-be pooling our considerable fire-fighting expertise into what we hope will be
-the world’s best tool for incident response.
+[Pete][pete], [Stephen][stephen], [Chris][chris] and [Lisa][lisa] at
+[incident.io](https://incident.io/), where we’ll be pooling our considerable
+fire-fighting expertise into what we hope will be the world’s best tool for
+incident response.
 
 I couldn’t be more excited for the challenge, and look forward to the really
 early stages I missed at GC!
