@@ -9,26 +9,26 @@ references:
 
   cache_bundle_for_lockfile: &cache_bundle_for_lockfile
     save_cache:
-      key: ruby3.0.1-Gemfile-{{ checksum "Gemfile.lock" }}
+      key: ruby3.0.2-Gemfile-{{ checksum "Gemfile.lock" }}
       paths:
         - vendor/bundle
 
   cache_bundle: &cache_bundle
     save_cache:
-      key: ruby3.0.1-Gemfile
+      key: ruby3.0.2-Gemfile
       paths:
         - vendor/bundle
 
   restore_bundle: &restore_bundle
     restore_cache:
       keys:
-        - ruby3.0.1-Gemfile-{{ checksum "Gemfile.lock" }}
-        - ruby3.0.1-Gemfile
+        - ruby3.0.2-Gemfile-{{ checksum "Gemfile.lock" }}
+        - ruby3.0.2-Gemfile
 
 jobs:
   build:
     docker:
-      - image: "ruby:2.7.1"
+      - image: "ruby:3.0.2"
     working_directory: ~/blog
     steps:
       - checkout
