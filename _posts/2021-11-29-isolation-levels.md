@@ -98,7 +98,7 @@ commits.
 If no one is permitted to modify the data, it follows that it cannot change
 throughout our transaction, ensuring repeatable reads.
 
-## Suprising?
+## Surprised?
 
 This might be old news to some, but I think it’s normal not to know this.
 
