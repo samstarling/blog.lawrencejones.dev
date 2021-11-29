@@ -3,6 +3,7 @@ layout: post
 title:  "What developers find surprising about Postgres transactions"
 date:   "2021-11-29 10:00:00 +0000"
 image:  /assets/images/isolation-levels.png
+hackernews: https://news.ycombinator.com/item?id=29379525
 tags:
   - postgres
 excerpt: |
