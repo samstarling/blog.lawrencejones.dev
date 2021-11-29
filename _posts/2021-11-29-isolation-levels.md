@@ -83,16 +83,16 @@ isn't built to handle other users modifying the data until it's done with it.
 
 In `read committed` world, you can opt-into stronger defenses using an [explicit
 row lock][postgres/explicit-locking]. Our example can be amended with a `FOR
-UPDATE` modifier:
+SHARE` modifier:
 
 ```sql
 /* 1 */ begin;
-/* 2 */ select * from organisations where id = 'bananas' for update;
+/* 2 */ select * from organisations where id = 'bananas' for share;
 /* 3 */ select * from organisations where id = 'bananas';
 /* 4 */ commit;
 ```
 
-In this circumstance, query (2) has acquired an update lock on `bananas` which
+In this circumstance, query (2) has acquired an share lock on `bananas` which
 will block any other transaction from modifying the row until our transaction
 commits.
 
