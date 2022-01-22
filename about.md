@@ -6,29 +6,26 @@ feature-img: assets/images/feature-london.jpg
 ---
 
 [gocardless]: https://gocardless.com/
+[incident.io]: https://incident.io/
 [me@twitter]: https://www.twitter.com/lawrjones
 [me@mailto]: mailto:lawrjone@gmail.com?subject=Hey!
 
-My name is Lawrence and I'm a Principal Engineer at [GoCardless][gocardless],
-where I help build our global recurring payments platform.
+I'm Lawrence, a Product Engineer working at [incident.io][incident.io], building
+an incident response tool that can help respond and learn from incidents.
 
-My last few years have been spent working in infrastructure as an SRE, with
-lofty ambitions of building a self-service platform with minimal reinvented
-wheels.
-
-Around this, I've worked in and with a number of teams building the GoCardless
-product. This meant optimising payment pipelines, amateur contributions to
-machine-learning models, and being forced to develop skills and opinions around
-how to build and lead engineering teams.
+Before incident I worked as a Principal Engineer at [GoCardless][gocardless],
+where I worked on a number of projects within both the SRE space and the
+product.
 
 This blog is about sharing what I've learned so other people can benefit, and
 getting better at doing that sharing. The themes will be drawn from my work, so
-expect technical subjects like Postgres and Kubernetes and the occasional
-tech-lead theme like incident response or onboarding.
+expect technical subjects like Postgres and Kubernetes and broader themes like
+incident response or career development.
 
-If you enjoy what I write, send me an [email][me@mailto] or grab me on Twitter
-[@lawrjones][me@twitter]. I love understanding other people's perspective and am
-always up for a (remote or otherwise!) coffee.
+If you enjoy what I write and want to hear more, follow me
+[@lawrjones][me@twitter] where I'll post any new content. Similarly, if you have
+any questions about my writing then don't hesistate to message- I love hearing
+other people's perspective and am always up for a (remote or otherwise!) coffee.
 
 ## Open-Source Projects
 
