@@ -3,7 +3,7 @@ layout: post
 title:  "Fixing flaky dbt tests with a sync cutoff"
 date:   "2022-02-09 12:00:00 +0000"
 image:  /assets/images/goa-docs.png
-hackernews: TODO
+hackernews: null
 tags:
   - data
   - dbt
@@ -182,7 +182,7 @@ Then for each of our table models, we apply the cutoff against the row created
 at:
 
 ```sql
-with
+{% raw %}with
 
 source as (
   select
@@ -202,7 +202,7 @@ renamed as (
     source
 )
 
-select * from renamed
+select * from renamed{% endraw %}
 ```
 
 Using `ref('sync_watermarks')` means dbt will know to build the
