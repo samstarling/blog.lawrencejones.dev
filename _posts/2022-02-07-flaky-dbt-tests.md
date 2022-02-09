@@ -2,8 +2,7 @@
 layout: post
 title:  "Fixing flaky dbt tests with a sync cutoff"
 date:   "2022-02-09 12:00:00 +0000"
-image:  /assets/images/goa-docs.png
-hackernews: null
+hackernews: https://news.ycombinator.com/item?id=30272312
 tags:
   - data
   - dbt
