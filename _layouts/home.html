@@ -12,6 +12,7 @@ layout: default
 
   <div class="posts">
     {% for post in paginator.posts %}
+    {% if post.draft == false %}
     <div class="post-teaser">
       <header>
         <h1>
@@ -42,6 +43,7 @@ layout: default
         </a>
       </div>
     </div>
+    {% endif %}
     {% endfor %}
   </div>
 
