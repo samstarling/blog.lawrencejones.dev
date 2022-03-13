@@ -26,10 +26,10 @@ whether the impact was a net positive is something I'm not certain of.
 I rejoined GoCardless in 2016 when the company was 80 people, with 20
 engineers across 3 teams.
 
-For those who don't know, GoCardless is a payments company offering an API
-similar to Stripe's, with a focus on bank-to-bank payments. In the most simple
-terms, GC receives requests to create payments, batches them and sends them to
-the clearing houses for processing.
+GoCardless is a payments company offering an API similar to Stripe's, with a
+focus on bank-to-bank payments. In the most simple terms, GC receives requests
+to create payments, batches them and sends them to the clearing houses for
+processing.
 
 The team I joined was Core Payments & Internal Tools (CPIT), whose key
 responsibility was to safeguard the payment process. As is traditional in
@@ -92,7 +92,8 @@ used tools like [OpenMP][openmp] before, I thought we could adapt a similar
 technique for each of the async Que workers, buulding an abstraction to easily
 change single-threaded code into a multi-threaded work-group.
 
-I started drafting what that might look like:
+I started drafting what that might look like, assuming we built an abstraction
+on top of the Que job queue called QueCommit:
 
 ```ruby
 # The top-level job that finds and enqueues sub-jobs:
@@ -123,7 +124,7 @@ end
 
 I figured if you split the work into one job for loading the batches and
 coordinating, and another that does the work of transitioning the payments, we
-could use a hypothetical `QueCommit` construct to transactionally enqueue all
+could use a hypothetical QueCommit construct to transactionally enqueue all
 those batch jobs and wait until they finished.
 
 All QueCommit had to do was poll the queue (jobs are stored in Postgres, so a
@@ -171,17 +172,19 @@ made, impact over this timescale is really hard to quantify.
 
 As an example, GoCardless continues to run one of the world's largest Ruby on
 Rails monoliths. I still believe QueCommit helped avoid a premature splitting of
-that monolith, but perhaps tackling that split earlier would have been better in
-the long term: maybe GC would be a productive micro-service company by now, and
-paid that debt off long ago?
+that monolith, and it's my opinion that running on a monolithic has been a huge
+help for GC to scale their business.
 
-Equally, supporting Que required us to build significant Postgres expertise
-inside the GoCardless engineering function. That expertise biased us to prefer
-Postgres as a technology, even when it demanded a lot of upfront investment from
-us. An alternate reality would've seen us shift to something like Cloud Spanner
-and avoid the long-tail of Postgres scaling the company now faces.
+But I could make arguments for the other case, too. Because GC so successfully
+scaled their monolith, the most painful problems they face now are how to
+split it in order to handle the next 10x growth. Maybe without QueCommit, we'd
+have been forced to break things up sooner, and perhaps that would have been
+better?
 
-So impactful yes, but I'll never know if the net outcome was positive. Either
-way, watching how QueCommit evolved while GC rebuilt itself several times over
-has been a great lesson for me, and one I'm grateful to have from my tenure at
-GoCardless.
+I'm not convinced, but that's the issue with complex outcomes like this: we'll
+never really know.
+
+Either way, watching QueCommit evolve while GC rebuilt itself several times over
+has been a great lesson for me. It's one of the many benefits you get by joining
+an early stage company and sticking around, where you get to see which of your
+bets come through. I'm certainly grateful for it.
