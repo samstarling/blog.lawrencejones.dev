@@ -51,3 +51,9 @@ ul {
   list-style-position: outside;
   margin-left: 24px; // bump the list markers back inline with the rest of text
 }
+
+.post-content {
+  max-width: 760px;
+  margin-right: auto;
+  margin-left: auto;
+}
