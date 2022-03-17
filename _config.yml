@@ -58,6 +58,7 @@ theme_settings:
 
   # Scripts
   google_analytics: UA-134680924-1
+  google_analytics_v4: G-2FV47623W0
   disqus_shortname:
   katex: false  # Enable if using math markup, but beware lighthouse
   search: false  # Enable the search feature
