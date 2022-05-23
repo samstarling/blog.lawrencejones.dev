@@ -20,6 +20,10 @@ excerpt: |
 
 ---
 
+> Turns out I love incident response so much I joined
+> [incident.io](https://incident.io/), where we're building a tool that helps
+> you do all of this and more, for much less effort.
+
 Throughout my career, I’ve always gravitated toward incidents. Maybe it’s the
 drama, or I like to see how things go wrong. Perhaps… maybe I even cause them?
 
@@ -130,11 +134,11 @@ Turn to Slack (or whatever your equivalent is):
 [netflix/dispatch]: https://netflixtechblog.com/introducing-dispatch-da4b8a2a8072
 
 - The first action in any incident should be creating a message channel. Several
-  tools ([monzo/response][monzo/response], [Netflix’s
-  Dispatch][netflix/dispatch]) can automatically create that (and more) for you,
-  but even if you have to painstakingly click those buttons yourself, do it.
-  It’s way worth the additional minute of downtime to get that space
-  ready-to-go.
+  tools ([incident.io](https://incident.io/), [monzo/response][monzo/response],
+  [Netflix’s Dispatch][netflix/dispatch]) can automatically create that (and
+  more) for you, but even if you have to painstakingly click those buttons
+  yourself, do it. It’s way worth the additional minute of downtime to get that
+  space ready-to-go.
 - I strongly advocate against private incident response channels. Company
   culture providing, a public channel can level-up your response by increasing
   ease of access to information. This can prevent coordination issues that you’d
