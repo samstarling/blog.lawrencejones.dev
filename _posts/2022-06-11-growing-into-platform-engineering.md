@@ -3,7 +3,7 @@ layout: post
 title:  "Growing into Platform Engineering"
 date:   "2022-06-11 12:00:00 +0000"
 image:  /assets/images/growing-platform-engineering.jpg
-hackernews: TODO
+hackernews: https://news.ycombinator.com/item?id=31704121
 tags:
   - engineering
 excerpt: |
@@ -201,10 +201,8 @@ you can get a huge amount of value from a bargain basement JSON setup.
 
 [service-registry]: https://blog.lawrencejones.dev/service-registry/
 
-I wrote a detailed article about this service registry back when we'd first
-built it, which I'd advise reading if you want more info:
-
-[https://blog.lawrencejones.dev/service-registry/][service-registry]
+I wrote a [detailed article][service-registry] about this service registry back
+when we'd first built it, which I'd advise reading if you want more info.
 
 ## 3. You can’t sell a product no one wants.
 
