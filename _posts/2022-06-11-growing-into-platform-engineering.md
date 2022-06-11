@@ -2,7 +2,7 @@
 layout: post
 title:  "Growing into Platform Engineering"
 date:   "2022-06-11 12:00:00 +0000"
-image:  /assets/images/most-impactful.png
+image:  /assets/images/growing-platform-engineering.jpg
 hackernews: TODO
 tags:
   - engineering
