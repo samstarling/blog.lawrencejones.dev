@@ -2,7 +2,6 @@
 layout: page
 title: About
 permalink: /about/
-feature-img: assets/images/feature-london.jpg
 ---
 
 [gocardless]: https://gocardless.com/
