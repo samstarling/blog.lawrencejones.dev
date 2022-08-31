@@ -3,7 +3,7 @@ layout: post
 title:  "Want to found a start-up? Work at one first!"
 date:   "2022-08-30 12:00:00 +0000"
 image:  /assets/images/learn-at-scale-up.png
-hackernews: TODO
+hackernews: https://news.ycombinator.com/item?id=32660443
 tags:
   - engineering
 excerpt: |
