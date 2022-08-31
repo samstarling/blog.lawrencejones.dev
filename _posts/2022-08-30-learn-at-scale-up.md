@@ -141,9 +141,10 @@ migrating their system into our own.
 
 While being the smallest of acquisitions, it was still an experience of how
 these things are run, and gave me a first-hand view into how something like this
-is executed. I came away with opinions on how much to commit about a technical
-plan up-front, and some red flags to look for when trying to integrate a totally
-foreign system into your own, or work with a team outside of your organisation.
+is executed. I came away with opinions on how much technical detail should be
+worked into a legal document (almost none), and some red flags to look for when
+trying to integrate a totally foreign system into your own, or work with a team
+outside of your organisation.
 
 I'm unlikely to find myself doing exactly this again, but having real experience
 of this process – however small – means I have a good idea of what this should
