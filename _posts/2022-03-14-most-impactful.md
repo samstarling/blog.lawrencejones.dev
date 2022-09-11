@@ -20,7 +20,7 @@ most impactful code you ever wrote?".
 I hadn't considered this before and was surprised I had an answer ready. Though
 whether the impact was a net positive is something I'm not certain of.
 
-# Setting the scene
+## Setting the scene
 
 I rejoined GoCardless in 2016 when the company was 80 people, with 20
 engineers across 3 teams.
@@ -55,7 +55,7 @@ The cause of our concern was on high volume days (~200k payments) this process
 could take up-to 4hrs, which meant we risked missing the 7pm deadline to submit
 files for that day to the banks.
 
-# The code
+## The code
 
 Of the various jobs in this pipeline, the process that found and transitioned
 the payments was responsible for the majority of the runtime. In psuedocode, it
@@ -134,7 +134,7 @@ could support several concurrent batchers without saturation, meaning you'd get
 about Nx speed-ups for however many workers we used: for us, that meant about
 5-10x improvements.
 
-# That's all?
+## That's all?
 
 Yeah, that's it. Building QueCommit took an evening and the next day, and
 gradually changing pipeline jobs to use it was something I did in my spare time
@@ -163,7 +163,7 @@ batch processes, most of which were critical to GC's operation. Despite being
 five years old and handling 20x the load it was created for, the implementation
 was mostly unchanged.
 
-# Hard to quantify
+## Hard to quantify
 
 While I'm confident QueCommit is one of the most impactful contributions I've
 made, impact over this timescale is really hard to quantify.

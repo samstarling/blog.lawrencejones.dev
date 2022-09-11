@@ -93,7 +93,7 @@ have that perspective.
 ## Agency, remit and responsibility
 
 At big companies, process and red-tape enforce limits on the way you behave,
-occassionally for good reason.
+occasionally for good reason.
 
 But start-ups don't work like this. The prime directive of an early-stage
 company is to move fast, and employees are given substantial agency to tackle
