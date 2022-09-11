@@ -58,7 +58,7 @@ and translated into an accelerated career path which I think was well worth the
 time spent. For me, the time I spent paid off in a big way, and I’d say as much
 to anyone in a similar position as I was when I first started.
 
-# But…
+## But…
 
 There is a dark side to this, though. Looking through the replies to Jordan’s
 tweet, I emphatically agreed with a lot of the warnings, and sympathised with
@@ -116,7 +116,7 @@ of losing your ability to be present and enjoy your life when you’re not at a
 desk making ‘progress’. Years after when you want to rid yourself of this itch,
 you may find it far more difficult to shake than it was to acquire.
 
-# Learning from others
+## Learning from others
 
 As someone who has to be careful with how much time I give to work, I’ve been
 really lucky to have great role models who have helped shape my thinking about
@@ -182,7 +182,7 @@ however, an extremely useful insight into a secondary consequence of working
 this hard. And one I found invaluable as I found myself leading, not just
 working in, teams.
 
-# Where does that leave us?
+## Where does that leave us?
 
 One reason I found Grey and Norberto’s actions to be so compelling is because
 neither gave advice to just stop, or work less. I don’t come to work to idle

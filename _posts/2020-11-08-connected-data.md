@@ -43,7 +43,7 @@ example where 2hrs of analysis helped prioritise 2-4 weeks of engineering work.
 We’ll end up with query that joins across two very different datasources, which
 you can preview at this post’s [sample Gist][gist].
 
-# Should we send fat webhooks?
+## Should we send fat webhooks?
 
 [gocardless/api]: https://developer.gocardless.com/api-reference/
 [gocardless/webhooks]: https://developer.gocardless.com/api-reference/#appendix-webhooks
@@ -98,7 +98,7 @@ Before we ever consider this, though, we need to know how many API requests
 could be attributed to this behaviour. Without the data, we could be vastly
 overestimating the number of integrators who make requests in this manner.
 
-# Webhook callbacks, how much do they cost?
+## Webhook callbacks, how much do they cost?
 
 Our goal is to understand if these webhook callback requests consume a
 significant amount of our API capacity. If the cost is negligible, then it makes
@@ -131,7 +131,7 @@ With this, we can say:
 
 Now we explore our data to see how we can use this.
 
-# Choosing your data
+## Choosing your data
 
 The thrust of this article is that a connected dataset is worth more than the
 sum of its parts. By exporting such a variety of data sources in BigQuery, we
@@ -140,7 +140,7 @@ can combine them in ways that aren’t practical to predict in advance.
 We’ll combine two such sources to answer our question: the `webhooks` table of
 our relational Postgres database, and HTTP request logs.
 
-## `webhooks`
+### `webhooks`
 
 As a developer configuring webhooks, it’s really useful to see what is being
 sent. Often you screw up the endpoint or your receiver is failing for some
@@ -184,7 +184,7 @@ application which powers a significant part of our product. Unsurprisingly, this
 was one of the first data sources exported to BigQuery, so we can easily use
 this table for our analysis.
 
-## `merchant_activity`
+### `merchant_activity`
 
 To analyse API requests, we’d normally reach for HTTP logs from our servers.
 GoCardless uses Elasticsearch to store application logs, which are collected
@@ -211,7 +211,7 @@ resources, something like `GET /payments/PM123`. For these requests, we log a
 }
 ```
 
-# Connecting the dots
+## Connecting the dots
 
 [gist/query.sql]: https://gist.github.com/lawrencejones/5850c75ecdcbb77492c9e37d11076643#file-query-sql
 [bigquery/user-defined-functions]: https://cloud.google.com/bigquery/docs/reference/standard-sql/user-defined-functions#javascript-udf-structure
@@ -431,7 +431,7 @@ These are the exceptions though, and webhook callbacks are typically quite
 inactive. When averaged over the entire day, **only 2.9% of API traffic was
 webhook driven**.
 
-# So what?
+## So what?
 
 This might seem disappointing, right? We did all this just to find out that
 webhook requests make up only 3% of total API traffic, not half as juicy as we

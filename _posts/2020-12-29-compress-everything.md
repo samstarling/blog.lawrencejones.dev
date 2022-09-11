@@ -32,7 +32,7 @@ Outside of well known use cases, there are a variety of opportunities to improve
 efficiency or save a load of money by leveraging compression. It’s useful to be
 aware of common use cases, so you can take these opportunities when they arise.
 
-# Migrating logs
+## Migrating logs
 
 As a recent example, my team were migrating logs from one Elasticsearch cluster
 to another. While not quite Big Data™, this cluster had 10 billion log entries,
@@ -90,7 +90,7 @@ optimise for engineering hours over infrastructure cost.
 
 But if you can reduce cost with a minimal amount of effort, you should.
 
-# Publishing compressed messages
+## Publishing compressed messages
 
 To this end, we made a small change to our migration tool (`elastic-toolbox`) to
 support compression of the messages we published to Pub/Sub.
@@ -166,7 +166,7 @@ func (f *pubsubExportTarget) compress(data []byte) ([]byte, error) {
 }
 ```
 
-# How much did we save?
+## How much did we save?
 
 As our savings will be proportional to our compression ratio (compressed /
 original bytes), we care a lot about how compressible our data is.
@@ -206,7 +206,7 @@ Explore the data for yourself at this <a
 href="https://snapshot.raintank.io/dashboard/snapshot/gHTtGvZh2hK67q03kIU4uJM3q4Sqek8p?orgId=2"
 target="_blank">Raintank Snapshot: elastic-toolbox compression</a>.
 
-# Next step? Apply fulltime.
+## Next step? Apply fulltime.
 
 The most obvious next step was to apply this to our logging pipeline all the
 time. Given we ship container logs straight into Pub/Sub, pulling them out of a
@@ -226,7 +226,7 @@ which works out to be **several thousand a month**:
   </figcaption>
 </figure>
 
-# Where else can compression help?
+## Where else can compression help?
 
 If you work in a Cloud environment, there are so many opportunities to save
 money by compressing your data.
@@ -259,7 +259,7 @@ the replica to handle the stream without issue**.
 
 There are more examples, but I think this paints a good picture.
 
-# How does this help you?
+## How does this help you?
 
 Compression is a trade-off, a decision we make to trade CPU for another resource
 that might be more expensive or less available. The value assigned to CPU,

@@ -32,7 +32,7 @@ bundle with your app, well, things get a bit harder.
 With the new `embed` directive, including files becomes easy. And it opens the
 door for some really great UX improvements!
 
-# Website in a binary? Why not!
+## Website in a binary? Why not!
 
 I have a long-running side-project called
 [pgsink](https://github.com/lawrencejones/pgsink) which aims to be a lightweight
@@ -62,7 +62,7 @@ so adding an install step that configures web assets was also… yuck.
 Screw this, I want to keep my single binary. Let’s see how `embed` makes this
 possible.
 
-# Project structure
+## Project structure
 
 First, project structure: pgsink has a Golang app at root, with
 `cmd/pgsink/main.go` as the binary entrypoint (what you’ll pass to `go build
@@ -84,7 +84,7 @@ Shown as a tree, it looks like this:
         └── src
             └── components
 
-# Embed the assets
+## Embed the assets
 
 First, we need to embed the assets. Remember this will work only work with Go >= 1.16,
 which isn’t released yet. I’m using the release candidate for now: run `go get
@@ -121,7 +121,7 @@ helps you work with embedded content. You can find the full documentation at
   consolidation (see [File System Interfaces for
   Go](https://go.googlesource.com/proposal/+/master/design/draft-iofs.md))
 
-# Building a `http.Handler`
+## Building a `http.Handler`
 
 Now we have the website stored in `web.Assets`, we need to write a
 `http.Handler` that can serve them.
@@ -204,7 +204,7 @@ The compiled binary can now serve the site without touching the filesystem:
     component=http request_id=WczI7yhi event=http_request http_method=GET
         http_path=/web/static/css/main.44817166.chunk.css http_status=200 http_bytes=141 http_duration=2.8524e-05
 
-# Build pipeline
+## Build pipeline
 
 For fast CI builds, you want to separate the building of Javascript assets from
 your Golang toolchain. Producing a release binary will need to combine the two,
@@ -272,7 +272,7 @@ bundling the Javascript toolchain alongside the Golang docker image.
   </figcaption>
 </figure>
 
-# Wrapping up
+## Wrapping up
 
 This is just one way the `embed` directive can really improve the experience
 around distributing Golang apps. It won’t always be a good idea- bundling a

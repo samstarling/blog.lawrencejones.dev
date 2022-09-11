@@ -42,7 +42,7 @@ As part of a revamp of our infrastructure tooling, we've introduced a service
 registry into GoCardless. This post explains how we built the registry and some
 of the use cases we've found for it.
 
-# What is it?
+## What is it?
 
 [jsonnet]: https://jsonnet.org/
 
@@ -88,7 +88,7 @@ Jsonnet library means it costs very little to add a new type. We began with
 a natural evolution to add `teams`, and this pattern has happened many times
 over.
 
-## Service entry (make-it-rain)
+### Service entry (make-it-rain)
 
 [gist/make-it-rain.json]: https://gist.github.com/lawrencejones/b209a1a5da864b987cbedb1dffef6116#file-make-it-rain-json
 [gist/make-it-rain.jsonnet]: https://gist.github.com/lawrencejones/b209a1a5da864b987cbedb1dffef6116#file-make-it-rain-jsonnet
@@ -153,7 +153,7 @@ that defines where the deployment lives.
 There's some configuration of team permissions and Google Cloud Platform
 references- we'll see how we can use them next.
 
-# Provisioning infrastructure
+## Provisioning infrastructure
 
 [terraform]: https://www.terraform.io/
 [chef]: https://www.chef.io/products/chef-infra
@@ -181,7 +181,7 @@ out-of-date, a benefit we'll see when we integrate it with our
 
 Let's see how this works in practice.
 
-## Kubernetes
+### Kubernetes
 
 When someone creates a service like make-it-rain, we'll import their entry into
 the registry. Our CD pipelines will detect a registry change and begin
@@ -274,7 +274,7 @@ allows us to map over all namespaces in a cluster and provision the
 manipulation, proving–yet again!–how using a static registry does not limit how
 flexibly you can query the data.
 
-## Google Cloud Platform
+### Google Cloud Platform
 
 It's not just Kubernetes resources in Jsonnet, though. GoCardless is a heavy
 user of Google Cloud Platform, and if this permission model is sound, we should
@@ -417,14 +417,14 @@ If you do it right, it should help a small group of SREs manage an ever
 increasing number of services, using the automation to ensure consistency.
 That's what we hope, at any rate!
 
-# Tooling
+## Tooling
 
 So far we've covered provisioning of infrastructure, possibly the most useful
 way to leverage a service registry. But once you use it to create
 infrastructure, the registry becomes a trusted map of everything that exists,
 which can be a great help when creating user friendly developer tools.
 
-## Discovery
+### Discovery
 
 Before anyone can use the registry, they need to access it. If we're aiming to
 make the registry truly ubiquitous, we need to provide tools that can fetch a
@@ -480,7 +480,7 @@ $ utopia registry | jq keys
 
 So now it's accessible everywhere, what can we do with it?
 
-## Improving UX
+### Improving UX
 
 Like many teams, our maturing Kubernetes expertise encouraged us to break our
 large cluster into many smaller clusters. Where most services used to live in a
@@ -546,7 +546,7 @@ These improvements may seem small, but can reduce cognitive load in situations
 where it really pays, such as during incident response. The efforts to make
 developers lives easier are, I think, appreciated.
 
-## Monitoring and alerting
+### Monitoring and alerting
 
 As the final case study, it's worth demonstrating how easily a static registry
 can be translated into a totally different medium.
@@ -642,7 +642,7 @@ alert elsewhere.
 This is just one of the ways we can use this data- we can even alert on any
 resources in our clusters that aren't in the registry, and more besides.
 
-# Closing
+## Closing
 
 At GoCardless, we're about to release a total reimagining of our infrastructure
 tooling, and the service registry has been an essential piece of that puzzle.
