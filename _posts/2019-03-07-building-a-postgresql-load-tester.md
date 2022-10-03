@@ -5,6 +5,7 @@ toc:    true
 date:   "2019-04-07 11:00:00 +0000"
 tags:
   - postgres
+image:  /assets/images/pgreplay-blocking.png
 hackernews: https://news.ycombinator.com/item?id=19605425
 excerpt: |
   <p>
