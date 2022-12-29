@@ -3,7 +3,7 @@ layout: post
 title:  "Weird stuff and how to test it"
 date:   "2022-12-29 12:00:00 +0000"
 image:  /assets/images/weird-testing.jpg
-hackernews: TODO
+hackernews: https://news.ycombinator.com/item?id=34171348
 tags:
   - engineering
 excerpt: |
