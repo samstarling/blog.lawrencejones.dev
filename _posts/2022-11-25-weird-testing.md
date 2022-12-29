@@ -29,7 +29,7 @@ infrastructure, or perhaps you're not trying to test 'code', per-say.
 
 I've faced my share of problems outside the usual mold, and found you can combat
 the complexity if you'll willing to get creative about investing in test or dev
-tooling. Most of these approaches generalise, and once you grok how they work,
+tooling. Most of these approaches generalise, and once you get how they work,
 you start seeing opportunities to use them everywhere.
 
 So here's some examples of problems that required out-of-box thinking to test,
@@ -83,7 +83,7 @@ spec:
 ```
 
 Which when evaluated by Helm - using a given set of values that provide things
-like the `replicaCount` - will become:
+like the `replicaCount` field - will become:
 
 ```yaml
 apiVersion: extensions/v1beta1
