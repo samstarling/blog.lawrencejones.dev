@@ -117,6 +117,7 @@ plugins:
   - jekyll-toc
   - jekyll-seo-tag
   - jekyll-sitemap
+  - jekyll-target-blank
 exclude:
   - Gemfile
   - Gemfile.lock
