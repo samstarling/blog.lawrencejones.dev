@@ -104,7 +104,7 @@ paginate: 5
 paginate_path: "blog/page:num"
 
 # BUILD SETTINGS
-future: true  # include future posts, why not?
+future: false  # don't include future, as it's a pain in the ass
 markdown: kramdown
 highlighter: rouge
 sass:
