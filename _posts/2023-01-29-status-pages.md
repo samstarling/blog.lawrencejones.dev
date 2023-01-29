@@ -2,7 +2,7 @@
 layout: post
 title:  "Uptime, status pages, and transparency calculus"
 date:   "2023-01-30 12:00:00 +0000"
-image:  /assets/images/todo.png
+image:  /assets/images/status-pages.png
 hackernews: TODO
 tags:
   - engineering
