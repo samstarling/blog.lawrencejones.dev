@@ -57,7 +57,7 @@ different perspective...
 </div>
 
 What's going on here, then? What does Cooper mean by "primary purpose ... is to
-convey to customers whether they'll be receiving funds"?
+convey to customers whether they'll be receiving refunds"?
 
 ## B2B and ELAs
 
@@ -136,7 +136,7 @@ but legally savvy buyer, did not help. In fact they got so tangled in the
 details that it made negotiation even more sticky, in a nasty situation where
 being fully transparent had made the prospect trust us even less.
 
-Finally, being open about your incidents can feel a bit like a mugs game. No
+Finally, being open about your incidents can feel a bit like a mug's game. No
 matter your industry, you'll have competitors who are less open than you about
 their issues, keeping a spotless status page despite you knowing they have
 frequent, severe outages. That can work against you in sales processes, or if
