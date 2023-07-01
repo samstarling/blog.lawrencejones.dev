@@ -42,8 +42,9 @@ Let's see what that looks like in practice.
 
 ## An example
 
-At incident.io, our engineering team is committed to moving fast, and we've made
-deliberate investments to enable copy-and-paste as a strategy to quickly build
+At [incident.io](https://incident.io/), our engineering team is committed to
+moving fast, and we've made deliberate investments to enable copy-and-paste as a
+strategy to quickly build
 new features.
 
 Our product is a Slack app, and most product features include building Slack
