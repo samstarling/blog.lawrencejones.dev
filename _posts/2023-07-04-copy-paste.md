@@ -2,12 +2,18 @@
 layout: post
 title:  "Copy-and-paste is the goal"
 date:   "2023-07-04 12:00:00 +0000"
-image:  /assets/images/copy-paste.png
+image:  /assets/images/copy-paste-code.png
 tags:
   - engineering
 excerpt: |
   <p>
-    TODO
+    From the moment you learn programming people tell you "don't repeat
+    yourself!"
+  </p>
+  <p>
+    So what I'm about to suggest might sound odd. But I'm here to say that if
+    you want to ship high-quality software at pace, you should be investing in
+    abstractions that are designed to enable copy-and-paste.
   </p>
 ---
 
