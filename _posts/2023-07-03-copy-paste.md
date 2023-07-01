@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "Copy-and-paste is the goal"
+title:  "Screw DRY – copy-paste is the goal."
 date:   "2023-07-03 12:00:00 +0000"
-image:  /assets/images/copy-paste-code.png
+image:  /assets/images/copy-paste-modals.png
 tags:
   - engineering
 excerpt: |
