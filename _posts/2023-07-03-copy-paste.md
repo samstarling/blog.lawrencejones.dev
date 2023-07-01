@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Copy-and-paste is the goal"
-date:   "2023-07-04 12:00:00 +0000"
+date:   "2023-07-03 12:00:00 +0000"
 image:  /assets/images/copy-paste-code.png
 tags:
   - engineering
