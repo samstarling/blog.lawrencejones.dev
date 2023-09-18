@@ -53,16 +53,8 @@ too.
 
 Let's begin by saying that in most applications, you want to be capturing every
 transition that a resource has made through a state machine and storing it for
-later analysis. While the formal model of a state machine is:
-
-1. A set of states `S`
-2. An input alphabet `Σ`
-3. A transition function `δ: (S, Σ) -> S` which takes the current state and an
-   input, then decides the next state
-
-And doesn't mention storing of transitions explicitly, it turns out that the
-'input alphabet' required to power the transition function almost always depends
-on the history of previous transitions, so we'll need to keep them around.
+later analysis. In some situations, you may even consider the history of
+transitions to decide which state to transition to next.
 
 That's why the first component of any database state machine will be creating a
 table to contain transitions.
